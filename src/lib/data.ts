@@ -10,6 +10,8 @@ export interface ProductionEntry {
   articleId: string;
   quantity: number;
   date: string; // ISO date string
+  color?: string;
+  detail?: string;
 }
 
 export interface Workshop {
