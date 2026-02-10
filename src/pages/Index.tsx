@@ -58,6 +58,7 @@ const Index = () => {
                 articles={articles}
                 weekStart={start}
                 weekEnd={end}
+                onChanged={refresh}
               />
             ))}
           </div>
