@@ -2,6 +2,8 @@ export interface Article {
   id: string;
   name: string;
   price: number;
+  color?: string;
+  detail?: string;
 }
 
 export interface ProductionEntry {
