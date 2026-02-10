@@ -17,6 +17,8 @@ export default function AddProductionDialog({ onAdded }: Props) {
   const [workshopId, setWorkshopId] = useState("");
   const [articleId, setArticleId] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [color, setColor] = useState("");
+  const [detail, setDetail] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 
   const articles = getArticles();
@@ -27,11 +29,13 @@ export default function AddProductionDialog({ onAdded }: Props) {
       toast({ title: "Erreur", description: "Veuillez remplir tous les champs.", variant: "destructive" });
       return;
     }
-    addProduction({ workshopId, articleId, quantity: Number(quantity), date });
+    addProduction({ workshopId, articleId, quantity: Number(quantity), date, color: color.trim() || undefined, detail: detail.trim() || undefined });
     toast({ title: "Production ajoutée", description: "L'entrée a été enregistrée avec succès." });
     setWorkshopId("");
     setArticleId("");
     setQuantity("");
+    setColor("");
+    setDetail("");
     setOpen(false);
     onAdded();
   };
@@ -82,6 +86,16 @@ export default function AddProductionDialog({ onAdded }: Props) {
           <div className="space-y-2">
             <Label>Quantité</Label>
             <Input type="number" min="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="Ex: 50" />
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1 space-y-2">
+              <Label>Couleur</Label>
+              <Input value={color} onChange={(e) => setColor(e.target.value)} placeholder="Ex: Rouge" />
+            </div>
+            <div className="flex-1 space-y-2">
+              <Label>Détails</Label>
+              <Input value={detail} onChange={(e) => setDetail(e.target.value)} placeholder="Ex: Taille L" />
+            </div>
           </div>
           <Button type="submit" className="w-full">Enregistrer</Button>
         </form>
