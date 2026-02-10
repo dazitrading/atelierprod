@@ -169,7 +169,7 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
                   <span className="text-sm flex-1">{article?.name || "—"}</span>
                   <span className="text-sm font-semibold">{entry.quantity}</span>
                   <span className="text-xs text-muted-foreground">× {article?.price.toLocaleString()} DA</span>
-                  <div className="opacity-0 group-hover:opacity-100 flex gap-0.5 transition-opacity">
+                  <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex gap-0.5 transition-opacity">
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(entry)}>
                       <Pencil className="h-3 w-3" />
                     </Button>
