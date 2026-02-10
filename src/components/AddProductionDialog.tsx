@@ -43,9 +43,10 @@ export default function AddProductionDialog({ onAdded }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Ajouter production
+        <Button size="sm" className="gap-1.5 sm:gap-2 text-xs sm:text-sm">
+          <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">Ajouter production</span>
+          <span className="sm:hidden">Ajouter</span>
         </Button>
       </DialogTrigger>
       <DialogContent>

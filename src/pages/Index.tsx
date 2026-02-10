@@ -23,24 +23,24 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container flex items-center justify-between py-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-primary p-2">
-              <Scissors className="h-5 w-5 text-primary-foreground" />
+        <div className="container flex items-center justify-between py-3 px-3 sm:px-6 sm:py-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="rounded-lg bg-primary p-1.5 sm:p-2">
+              <Scissors className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="font-display font-bold text-xl">ConfectionPro</h1>
-              <p className="text-xs text-muted-foreground">Gestion de production</p>
+              <h1 className="font-display font-bold text-base sm:text-xl">ConfectionPro</h1>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Gestion de production</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <ArticleManager onChanged={refresh} />
             <AddProductionDialog onAdded={refresh} />
           </div>
         </div>
       </header>
 
-      <main className="container py-8 space-y-8">
+      <main className="container px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
         {/* Week summary */}
         <section>
           <div className="flex items-center justify-between mb-4">

@@ -44,9 +44,10 @@ export default function ArticleManager({ onChanged }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Settings className="h-4 w-4" />
-          Articles
+        <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 text-xs sm:text-sm">
+          <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">Articles</span>
+          <span className="sm:hidden">Art.</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
