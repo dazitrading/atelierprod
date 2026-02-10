@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Send } from "lucide-react";
 import { WORKSHOPS, type ProductionEntry, type Article, deleteProduction } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
 
@@ -42,6 +42,7 @@ export default function ProductionTable({ production, articles, onChanged }: Pro
             <TableHead className="text-right">Prix unit.</TableHead>
             <TableHead className="text-right">Total</TableHead>
             <TableHead className="w-10"></TableHead>
+            <TableHead className="w-10"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -57,6 +58,15 @@ export default function ProductionTable({ production, articles, onChanged }: Pro
                 <TableCell className="text-right font-display font-semibold">{entry.quantity}</TableCell>
                 <TableCell className="text-right text-muted-foreground">{article?.price.toLocaleString() || "—"} DA</TableCell>
                 <TableCell className="text-right font-display font-semibold">{total.toLocaleString()} DA</TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" title="Envoyer par WhatsApp" onClick={() => {
+                    const date = new Date(entry.date).toLocaleDateString("fr-FR");
+                    const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DA\n💰 Total: ${total.toLocaleString()} DA`;
+                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                  }}>
+                    <Send className="h-3.5 w-3.5" />
+                  </Button>
+                </TableCell>
                 <TableCell>
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(entry.id)}>
                     <Trash2 className="h-3.5 w-3.5" />
