@@ -70,6 +70,15 @@ export function deleteProduction(id: string) {
   saveProduction(getProduction().filter((e) => e.id !== id));
 }
 
+export function updateProduction(id: string, updates: Partial<Omit<ProductionEntry, "id">>) {
+  const entries = getProduction();
+  const idx = entries.findIndex((e) => e.id === id);
+  if (idx !== -1) {
+    entries[idx] = { ...entries[idx], ...updates };
+    saveProduction(entries);
+  }
+}
+
 export function getWeekRange(): { start: string; end: string } {
   const now = new Date();
   const day = now.getDay();

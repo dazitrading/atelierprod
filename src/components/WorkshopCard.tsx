@@ -1,6 +1,11 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article } from "@/lib/data";
-import { Factory, Package, Banknote } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article, updateProduction, deleteProduction, getArticles } from "@/lib/data";
+import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const WORKSHOP_COLORS: Record<string, string> = {
   "atelier-1": "bg-workshop-1/10 border-workshop-1/30",
@@ -20,12 +25,51 @@ interface Props {
   articles: Article[];
   weekStart: string;
   weekEnd: string;
+  onChanged?: () => void;
 }
 
-export default function WorkshopCard({ workshop, production, articles, weekStart, weekEnd }: Props) {
+export default function WorkshopCard({ workshop, production, articles, weekStart, weekEnd, onChanged }: Props) {
   const { totalAmount, totalItems } = getWorkshopWeeklyTotal(
     workshop.id, production, articles, weekStart, weekEnd
   );
+
+  const [expanded, setExpanded] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editQty, setEditQty] = useState("");
+  const [editArticleId, setEditArticleId] = useState("");
+
+  const weekEntries = production
+    .filter((e) => e.workshopId === workshop.id && e.date >= weekStart && e.date <= weekEnd)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const articleMap = new Map(articles.map((a) => [a.id, a]));
+
+  const startEdit = (entry: ProductionEntry) => {
+    setEditingId(entry.id);
+    setEditQty(String(entry.quantity));
+    setEditArticleId(entry.articleId);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+  };
+
+  const saveEdit = (id: string) => {
+    if (!editQty || Number(editQty) <= 0) {
+      toast({ title: "Erreur", description: "La quantité doit être > 0", variant: "destructive" });
+      return;
+    }
+    updateProduction(id, { quantity: Number(editQty), articleId: editArticleId });
+    setEditingId(null);
+    toast({ title: "Entrée modifiée" });
+    onChanged?.();
+  };
+
+  const handleDelete = (id: string) => {
+    deleteProduction(id);
+    toast({ title: "Entrée supprimée" });
+    onChanged?.();
+  };
 
   return (
     <Card className={`border ${WORKSHOP_COLORS[workshop.id] || ""} animate-fade-in`}>
@@ -34,7 +78,12 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
           <div className={`rounded-lg p-2 bg-card ${ICON_COLORS[workshop.id] || ""}`}>
             <Factory className="h-5 w-5" />
           </div>
-          <h3 className="font-display font-semibold text-lg">{workshop.name}</h3>
+          <h3 className="font-display font-semibold text-lg flex-1">{workshop.name}</h3>
+          {weekEntries.length > 0 && (
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpanded(!expanded)}>
+              {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2">
@@ -52,6 +101,68 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
             </div>
           </div>
         </div>
+
+        {expanded && weekEntries.length > 0 && (
+          <div className="mt-4 border-t pt-3 space-y-2">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Détails de la semaine</p>
+            {weekEntries.map((entry) => {
+              const article = articleMap.get(entry.articleId);
+              const isEditing = editingId === entry.id;
+
+              if (isEditing) {
+                return (
+                  <div key={entry.id} className="flex items-center gap-2 rounded-md bg-secondary/50 p-2">
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      {new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+                    </span>
+                    <Select value={editArticleId} onValueChange={setEditArticleId}>
+                      <SelectTrigger className="h-8 text-xs flex-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {articles.map((a) => (
+                          <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={editQty}
+                      onChange={(e) => setEditQty(e.target.value)}
+                      className="h-8 w-20 text-xs"
+                    />
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-primary" onClick={() => saveEdit(entry.id)}>
+                      <Check className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={cancelEdit}>
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={entry.id} className="flex items-center gap-2 rounded-md hover:bg-secondary/30 p-2 group">
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+                  </span>
+                  <span className="text-sm flex-1">{article?.name || "—"}</span>
+                  <span className="text-sm font-semibold">{entry.quantity}</span>
+                  <span className="text-xs text-muted-foreground">× {article?.price.toLocaleString()} DA</span>
+                  <div className="opacity-0 group-hover:opacity-100 flex gap-0.5 transition-opacity">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(entry)}>
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(entry.id)}>
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
