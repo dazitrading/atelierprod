@@ -23,7 +23,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container flex items-center justify-between py-3 px-3 sm:px-6 sm:py-4">
+        <div className="container flex flex-wrap items-center justify-between gap-2 py-3 px-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="rounded-lg bg-primary p-1.5 sm:p-2">
               <Scissors className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
