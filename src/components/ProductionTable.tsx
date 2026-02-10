@@ -61,7 +61,9 @@ export default function ProductionTable({ production, articles, onChanged }: Pro
                 <TableCell>
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" title="Envoyer par WhatsApp" onClick={() => {
                     const date = new Date(entry.date).toLocaleDateString("fr-FR");
-                    const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DA\n💰 Total: ${total.toLocaleString()} DA`;
+                    const colorLine = entry.color ? `\n🎨 Couleur: ${entry.color}` : "";
+                    const detailLine = entry.detail ? `\n📝 Détails: ${entry.detail}` : "";
+                    const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DA\n💰 Total: ${total.toLocaleString()} DA`;
                     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
                   }}>
                     <Send className="h-3.5 w-3.5" />
