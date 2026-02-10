@@ -1,0 +1,91 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus } from "lucide-react";
+import { WORKSHOPS, getArticles, addProduction } from "@/lib/data";
+import { toast } from "@/hooks/use-toast";
+
+interface Props {
+  onAdded: () => void;
+}
+
+export default function AddProductionDialog({ onAdded }: Props) {
+  const [open, setOpen] = useState(false);
+  const [workshopId, setWorkshopId] = useState("");
+  const [articleId, setArticleId] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+
+  const articles = getArticles();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!workshopId || !articleId || !quantity || Number(quantity) <= 0) {
+      toast({ title: "Erreur", description: "Veuillez remplir tous les champs.", variant: "destructive" });
+      return;
+    }
+    addProduction({ workshopId, articleId, quantity: Number(quantity), date });
+    toast({ title: "Production ajoutée", description: "L'entrée a été enregistrée avec succès." });
+    setWorkshopId("");
+    setArticleId("");
+    setQuantity("");
+    setOpen(false);
+    onAdded();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="gap-2">
+          <Plus className="h-4 w-4" />
+          Ajouter production
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="font-display">Nouvelle entrée de production</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <Label>Date</Label>
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Atelier</Label>
+            <Select value={workshopId} onValueChange={setWorkshopId}>
+              <SelectTrigger><SelectValue placeholder="Choisir un atelier" /></SelectTrigger>
+              <SelectContent>
+                {WORKSHOPS.map((w) => (
+                  <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Article</Label>
+            <Select value={articleId} onValueChange={setArticleId}>
+              <SelectTrigger><SelectValue placeholder="Choisir un article" /></SelectTrigger>
+              <SelectContent>
+                {articles.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-muted-foreground">Aucun article. Ajoutez-en d'abord.</div>
+                ) : (
+                  articles.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>{a.name} — {a.price.toLocaleString()} DA</SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Quantité</Label>
+            <Input type="number" min="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="Ex: 50" />
+          </div>
+          <Button type="submit" className="w-full">Enregistrer</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
