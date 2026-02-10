@@ -18,9 +18,9 @@ export interface Workshop {
 }
 
 export const WORKSHOPS: Workshop[] = [
-  { id: "atelier-1", name: "Atelier 1" },
-  { id: "atelier-2", name: "Atelier 2" },
-  { id: "atelier-3", name: "Atelier 3" },
+  { id: "atelier-1", name: "MESKINE" },
+  { id: "atelier-2", name: "BOUJIDI" },
+  { id: "atelier-3", name: "DRISS" },
 ];
 
 const STORAGE_KEYS = {
