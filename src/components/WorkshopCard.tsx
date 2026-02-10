@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article, updateProduction, deleteProduction, getArticles } from "@/lib/data";
-import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2 } from "lucide-react";
+import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2, Send } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const WORKSHOP_COLORS: Record<string, string> = {
@@ -71,6 +71,20 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
     onChanged?.();
   };
 
+  const sendWhatsApp = () => {
+    const weekLabel = `${new Date(weekStart).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} — ${new Date(weekEnd).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}`;
+    let msg = `📋 *Situation ${workshop.name}*\n📅 Semaine: ${weekLabel}\n\n`;
+    for (const entry of weekEntries) {
+      const art = articleMap.get(entry.articleId);
+      if (art) {
+        const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+        msg += `• ${date} — ${art.name}: ${entry.quantity} × ${art.price.toLocaleString()} DA = ${(entry.quantity * art.price).toLocaleString()} DA\n`;
+      }
+    }
+    msg += `\n📦 Total articles: ${totalItems}\n💰 Montant total: ${totalAmount.toLocaleString()} DA`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+  };
+
   return (
     <Card className={`border ${WORKSHOP_COLORS[workshop.id] || ""} animate-fade-in`}>
       <CardContent className="p-5">
@@ -79,11 +93,16 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
             <Factory className="h-5 w-5" />
           </div>
           <h3 className="font-display font-semibold text-lg flex-1">{workshop.name}</h3>
-          {weekEntries.length > 0 && (
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpanded(!expanded)}>
-              {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" onClick={sendWhatsApp} title="Envoyer par WhatsApp">
+              <Send className="h-4 w-4" />
             </Button>
-          )}
+            {weekEntries.length > 0 && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpanded(!expanded)}>
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            )}
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2">
