@@ -39,8 +39,10 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
       setDetail("");
       setOpen(false);
       onAdded();
-    } catch {
-      toast({ title: "Erreur", description: "Impossible d'enregistrer.", variant: "destructive" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Impossible d'enregistrer.";
+      console.error("Erreur ajout production:", err);
+      toast({ title: "Erreur", description: message, variant: "destructive" });
     }
   };
 
