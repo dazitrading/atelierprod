@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article } from "@/lib/data";
 import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2, Send } from "lucide-react";
+import { getArticleIcon } from "./UniformIcons";
 import { toast } from "@/hooks/use-toast";
 
 const WORKSHOP_COLORS: Record<string, string> = {
@@ -173,7 +174,10 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
                   <span className="text-xs text-muted-foreground shrink-0">
                     {new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
                   </span>
-                  <span className="text-sm flex-1">{article?.name || "—"}</span>
+                  <span className="text-sm flex-1 flex items-center gap-1.5">
+                    {article ? (() => { const Icon = getArticleIcon(article.name); return <Icon size={16} className="text-muted-foreground shrink-0" />; })() : null}
+                    {article?.name || "—"}
+                  </span>
                   <span className="text-sm font-semibold">{entry.quantity}</span>
                   <span className="text-xs text-muted-foreground">× {article?.price.toLocaleString()} DA</span>
                   <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex gap-0.5 transition-opacity">
