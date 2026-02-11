@@ -1,25 +1,28 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Send } from "lucide-react";
-import { WORKSHOPS, type ProductionEntry, type Article, deleteProduction } from "@/lib/data";
+import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
 
 interface Props {
   production: ProductionEntry[];
   articles: Article[];
-  onChanged: () => void;
+  onDeleteProduction: (id: string) => Promise<void>;
 }
 
-export default function ProductionTable({ production, articles, onChanged }: Props) {
+export default function ProductionTable({ production, articles, onDeleteProduction }: Props) {
   const articleMap = new Map(articles.map((a) => [a.id, a]));
   const workshopMap = new Map(WORKSHOPS.map((w) => [w.id, w]));
 
   const sorted = [...production].sort((a, b) => b.date.localeCompare(a.date));
 
-  const handleDelete = (id: string) => {
-    deleteProduction(id);
-    onChanged();
-    toast({ title: "Entrée supprimée" });
+  const handleDelete = async (id: string) => {
+    try {
+      await onDeleteProduction(id);
+      toast({ title: "Entrée supprimée" });
+    } catch {
+      toast({ title: "Erreur", variant: "destructive" });
+    }
   };
 
   if (sorted.length === 0) {

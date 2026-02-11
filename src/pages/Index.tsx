@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
-import { WORKSHOPS, getProduction, getWeekRange } from "@/lib/data";
+import { WORKSHOPS, getWeekRange } from "@/lib/data";
 import { useArticles } from "@/hooks/useArticles";
+import { useProduction } from "@/hooks/useProduction";
 import WorkshopCard from "@/components/WorkshopCard";
 import ProductionTable from "@/components/ProductionTable";
 import AddProductionDialog from "@/components/AddProductionDialog";
@@ -8,21 +8,14 @@ import ArticleManager from "@/components/ArticleManager";
 import { Scissors } from "lucide-react";
 
 const Index = () => {
-  const [refreshKey, setRefreshKey] = useState(0);
-  const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
-
   const { articles, addArticle, deleteArticle } = useArticles();
-  const production = getProduction();
+  const { production, fetchProduction, addProduction, updateProduction, deleteProduction } = useProduction();
   const { start, end } = getWeekRange();
-
-  // Force re-render on refreshKey change
-  void refreshKey;
 
   const weekLabel = `${new Date(start).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} — ${new Date(end).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}`;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="container flex flex-wrap items-center justify-between gap-2 py-3 px-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -36,13 +29,12 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <ArticleManager articles={articles} onAdd={addArticle} onDelete={deleteArticle} />
-            <AddProductionDialog onAdded={refresh} />
+            <AddProductionDialog onAdded={fetchProduction} addProduction={addProduction} />
           </div>
         </div>
       </header>
 
       <main className="container px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
-        {/* Week summary */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -59,16 +51,16 @@ const Index = () => {
                 articles={articles}
                 weekStart={start}
                 weekEnd={end}
-                onChanged={refresh}
+                onUpdateProduction={updateProduction}
+                onDeleteProduction={deleteProduction}
               />
             ))}
           </div>
         </section>
 
-        {/* Production history */}
         <section>
           <h2 className="font-display font-semibold text-lg mb-4">Historique de production</h2>
-          <ProductionTable production={production} articles={articles} onChanged={refresh} />
+          <ProductionTable production={production} articles={articles} onDeleteProduction={deleteProduction} />
         </section>
       </main>
     </div>

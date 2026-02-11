@@ -5,15 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import { WORKSHOPS, addProduction, type Article } from "@/lib/data";
-import { toast } from "@/hooks/use-toast";
+import { WORKSHOPS, type ProductionEntry } from "@/lib/data";
 import { useArticles } from "@/hooks/useArticles";
+import { toast } from "@/hooks/use-toast";
 
 interface Props {
   onAdded: () => void;
+  addProduction: (entry: Omit<ProductionEntry, "id">) => Promise<void>;
 }
 
-export default function AddProductionDialog({ onAdded }: Props) {
+export default function AddProductionDialog({ onAdded, addProduction }: Props) {
   const [open, setOpen] = useState(false);
   const [workshopId, setWorkshopId] = useState("");
   const [articleId, setArticleId] = useState("");
@@ -24,21 +25,25 @@ export default function AddProductionDialog({ onAdded }: Props) {
 
   const { articles } = useArticles();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!workshopId || !articleId || !quantity || Number(quantity) <= 0) {
       toast({ title: "Erreur", description: "Veuillez remplir tous les champs.", variant: "destructive" });
       return;
     }
-    addProduction({ workshopId, articleId, quantity: Number(quantity), date, color: color.trim() || undefined, detail: detail.trim() || undefined });
-    toast({ title: "Production ajoutée", description: "L'entrée a été enregistrée avec succès." });
-    setWorkshopId("");
-    setArticleId("");
-    setQuantity("");
-    setColor("");
-    setDetail("");
-    setOpen(false);
-    onAdded();
+    try {
+      await addProduction({ workshopId, articleId, quantity: Number(quantity), date, color: color.trim() || undefined, detail: detail.trim() || undefined });
+      toast({ title: "Production ajoutée", description: "L'entrée a été enregistrée avec succès." });
+      setWorkshopId("");
+      setArticleId("");
+      setQuantity("");
+      setColor("");
+      setDetail("");
+      setOpen(false);
+      onAdded();
+    } catch {
+      toast({ title: "Erreur", description: "Impossible d'enregistrer.", variant: "destructive" });
+    }
   };
 
   return (

@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article, updateProduction, deleteProduction } from "@/lib/data";
+import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article } from "@/lib/data";
 import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2, Send } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -25,10 +25,11 @@ interface Props {
   articles: Article[];
   weekStart: string;
   weekEnd: string;
-  onChanged?: () => void;
+  onUpdateProduction: (id: string, updates: Partial<Omit<ProductionEntry, "id">>) => Promise<void>;
+  onDeleteProduction: (id: string) => Promise<void>;
 }
 
-export default function WorkshopCard({ workshop, production, articles, weekStart, weekEnd, onChanged }: Props) {
+export default function WorkshopCard({ workshop, production, articles, weekStart, weekEnd, onUpdateProduction, onDeleteProduction }: Props) {
   const { totalAmount, totalItems } = getWorkshopWeeklyTotal(
     workshop.id, production, articles, weekStart, weekEnd
   );
@@ -54,21 +55,27 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
     setEditingId(null);
   };
 
-  const saveEdit = (id: string) => {
+  const saveEdit = async (id: string) => {
     if (!editQty || Number(editQty) <= 0) {
       toast({ title: "Erreur", description: "La quantité doit être > 0", variant: "destructive" });
       return;
     }
-    updateProduction(id, { quantity: Number(editQty), articleId: editArticleId });
-    setEditingId(null);
-    toast({ title: "Entrée modifiée" });
-    onChanged?.();
+    try {
+      await onUpdateProduction(id, { quantity: Number(editQty), articleId: editArticleId });
+      setEditingId(null);
+      toast({ title: "Entrée modifiée" });
+    } catch {
+      toast({ title: "Erreur", variant: "destructive" });
+    }
   };
 
-  const handleDelete = (id: string) => {
-    deleteProduction(id);
-    toast({ title: "Entrée supprimée" });
-    onChanged?.();
+  const handleDelete = async (id: string) => {
+    try {
+      await onDeleteProduction(id);
+      toast({ title: "Entrée supprimée" });
+    } catch {
+      toast({ title: "Erreur", variant: "destructive" });
+    }
   };
 
   const sendWhatsApp = () => {
@@ -172,9 +179,9 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
                   <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex gap-0.5 transition-opacity">
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700" onClick={() => {
                       const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name}: ${entry.quantity} × ${article?.price.toLocaleString()} DA = ${(entry.quantity * (article?.price || 0)).toLocaleString()} DA`;
-                      if ((entry as any).color) msg += `\n🎨 Couleur: ${(entry as any).color}`;
-                      if ((entry as any).details) msg += `\n📝 Détails: ${(entry as any).details}`;
+                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name}: ${entry.quantity} × ${article?.price?.toLocaleString()} DA = ${(entry.quantity * (article?.price || 0)).toLocaleString()} DA`;
+                      if (entry.color) msg += `\n🎨 Couleur: ${entry.color}`;
+                      if (entry.detail) msg += `\n📝 Détails: ${entry.detail}`;
                       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
                     }} title="Envoyer par WhatsApp">
                       <Send className="h-3 w-3" />
