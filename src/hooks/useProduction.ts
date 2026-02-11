@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { ProductionEntry } from "@/lib/data";
-import { useAuth } from "@/hooks/useAuth";
 
 export function useProduction() {
-  const { user } = useAuth();
   const [production, setProduction] = useState<ProductionEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +35,8 @@ export function useProduction() {
   }, [fetchProduction]);
 
   const addProduction = useCallback(async (entry: Omit<ProductionEntry, "id">) => {
-    if (!user) throw new Error("Not authenticated");
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) throw new Error("Not authenticated");
     const { error } = await supabase.from("production").insert({
       workshop_id: entry.workshopId,
       article_id: entry.articleId,
@@ -45,7 +44,7 @@ export function useProduction() {
       date: entry.date,
       color: entry.color || null,
       detail: entry.detail || null,
-      user_id: user.id,
+      user_id: session.user.id,
     });
     if (error) throw error;
     await fetchProduction();
