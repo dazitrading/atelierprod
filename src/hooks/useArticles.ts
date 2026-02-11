@@ -35,6 +35,15 @@ export function useArticles() {
     await fetchArticles();
   }, [fetchArticles]);
 
+  const updateArticle = useCallback(async (id: string, updates: Partial<Omit<Article, "id">>) => {
+    const { error } = await supabase.from("articles").update(updates).eq("id", id);
+    if (error) {
+      console.error("Error updating article:", error);
+      throw error;
+    }
+    await fetchArticles();
+  }, [fetchArticles]);
+
   const deleteArticle = useCallback(async (id: string) => {
     const { error } = await supabase.from("articles").delete().eq("id", id);
     if (error) {
@@ -44,5 +53,5 @@ export function useArticles() {
     await fetchArticles();
   }, [fetchArticles]);
 
-  return { articles, loading, fetchArticles, addArticle, deleteArticle };
+  return { articles, loading, fetchArticles, addArticle, updateArticle, deleteArticle };
 }
