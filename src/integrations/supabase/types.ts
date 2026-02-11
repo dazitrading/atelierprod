@@ -35,6 +35,47 @@ export type Database = {
         }
         Relationships: []
       }
+      production: {
+        Row: {
+          article_id: string
+          color: string | null
+          created_at: string
+          date: string
+          detail: string | null
+          id: string
+          quantity: number
+          workshop_id: string
+        }
+        Insert: {
+          article_id: string
+          color?: string | null
+          created_at?: string
+          date?: string
+          detail?: string | null
+          id?: string
+          quantity: number
+          workshop_id: string
+        }
+        Update: {
+          article_id?: string
+          color?: string | null
+          created_at?: string
+          date?: string
+          detail?: string | null
+          id?: string
+          quantity?: number
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
