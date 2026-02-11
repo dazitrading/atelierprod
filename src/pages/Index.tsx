@@ -10,7 +10,7 @@ import { Scissors, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
-  const { articles, addArticle, deleteArticle } = useArticles();
+  const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
   const { signOut } = useAuth();
   const { production, fetchProduction, addProduction, updateProduction, deleteProduction } = useProduction();
   const { start, end } = getWeekRange();
@@ -31,7 +31,7 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <ArticleManager articles={articles} onAdd={addArticle} onDelete={deleteArticle} />
+            <ArticleManager articles={articles} onAdd={addArticle} onUpdate={updateArticle} onDelete={deleteArticle} />
             <AddProductionDialog onAdded={fetchProduction} addProduction={addProduction} articles={articles} />
             <Button variant="ghost" size="icon" onClick={signOut} title="Se déconnecter">
               <LogOut className="h-4 w-4" />
