@@ -170,6 +170,15 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
                   <span className="text-sm font-semibold">{entry.quantity}</span>
                   <span className="text-xs text-muted-foreground">× {article?.price.toLocaleString()} DA</span>
                   <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex gap-0.5 transition-opacity">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700" onClick={() => {
+                      const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name}: ${entry.quantity} × ${article?.price.toLocaleString()} DA = ${(entry.quantity * (article?.price || 0)).toLocaleString()} DA`;
+                      if ((entry as any).color) msg += `\n🎨 Couleur: ${(entry as any).color}`;
+                      if ((entry as any).details) msg += `\n📝 Détails: ${(entry as any).details}`;
+                      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                    }} title="Envoyer par WhatsApp">
+                      <Send className="h-3 w-3" />
+                    </Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(entry)}>
                       <Pencil className="h-3 w-3" />
                     </Button>
