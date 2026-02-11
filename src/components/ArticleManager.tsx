@@ -2,43 +2,44 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Settings, Plus, Trash2 } from "lucide-react";
-import { getArticles, addArticle, deleteArticle, type Article } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
+import type { Article } from "@/lib/data";
 
 interface Props {
-  onChanged: () => void;
+  articles: Article[];
+  onAdd: (article: Omit<Article, "id">) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export default function ArticleManager({ onChanged }: Props) {
+export default function ArticleManager({ articles, onAdd, onDelete }: Props) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [articles, setArticles] = useState<Article[]>(getArticles);
 
-  const refresh = () => {
-    setArticles(getArticles());
-    onChanged();
-  };
-
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !price || Number(price) <= 0) {
       toast({ title: "Erreur", description: "Nom et prix requis.", variant: "destructive" });
       return;
     }
-    addArticle({ name: name.trim(), price: Number(price) });
-    setName("");
-    setPrice("");
-    refresh();
-    toast({ title: "Article ajouté" });
+    try {
+      await onAdd({ name: name.trim(), price: Number(price) });
+      setName("");
+      setPrice("");
+      toast({ title: "Article ajouté" });
+    } catch {
+      toast({ title: "Erreur", description: "Impossible d'ajouter l'article.", variant: "destructive" });
+    }
   };
 
-  const handleDelete = (id: string) => {
-    deleteArticle(id);
-    refresh();
-    toast({ title: "Article supprimé" });
+  const handleDelete = async (id: string) => {
+    try {
+      await onDelete(id);
+      toast({ title: "Article supprimé" });
+    } catch {
+      toast({ title: "Erreur", description: "Impossible de supprimer l'article.", variant: "destructive" });
+    }
   };
 
   return (
