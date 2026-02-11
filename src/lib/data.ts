@@ -12,6 +12,7 @@ export interface ProductionEntry {
   date: string; // ISO date string
   color?: string;
   detail?: string;
+  createdAt?: string; // ISO timestamp
 }
 
 export interface Workshop {

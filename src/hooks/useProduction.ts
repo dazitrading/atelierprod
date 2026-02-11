@@ -25,6 +25,7 @@ export function useProduction() {
         date: e.date,
         color: e.color ?? undefined,
         detail: e.detail ?? undefined,
+        createdAt: e.created_at,
       }))
     );
     setLoading(false);

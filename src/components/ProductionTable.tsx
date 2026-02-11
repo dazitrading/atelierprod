@@ -14,7 +14,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
   const articleMap = new Map(articles.map((a) => [a.id, a]));
   const workshopMap = new Map(WORKSHOPS.map((w) => [w.id, w]));
 
-  const sorted = [...production].sort((a, b) => b.date.localeCompare(a.date));
+  const sorted = [...production].sort((a, b) => (b.createdAt || b.date).localeCompare(a.createdAt || a.date));
 
   const handleDelete = async (id: string) => {
     try {
@@ -57,7 +57,14 @@ export default function ProductionTable({ production, articles, onDeleteProducti
               const total = article ? entry.quantity * article.price : 0;
               return (
                 <TableRow key={entry.id}>
-                  <TableCell className="text-sm">{new Date(entry.date).toLocaleDateString("fr-FR")}</TableCell>
+                  <TableCell className="text-sm">
+                    <div>{new Date(entry.date).toLocaleDateString("fr-FR")}</div>
+                    {entry.createdAt && (
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(entry.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">{workshop?.name || "—"}</TableCell>
                   <TableCell>{article?.name || "—"}</TableCell>
                   <TableCell className="text-right font-display font-semibold">{entry.quantity}</TableCell>
@@ -95,7 +102,10 @@ export default function ProductionTable({ production, articles, onDeleteProducti
           return (
             <div key={entry.id} className="rounded-lg border bg-card p-3 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">{new Date(entry.date).toLocaleDateString("fr-FR")}</span>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(entry.date).toLocaleDateString("fr-FR")}
+                  {entry.createdAt && ` à ${new Date(entry.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`}
+                </span>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600" onClick={() => {
                     const date = new Date(entry.date).toLocaleDateString("fr-FR");
