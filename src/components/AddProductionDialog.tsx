@@ -8,6 +8,11 @@ import { Plus, Trash2 } from "lucide-react";
 import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
 
+const COLORS = [
+  "Noir", "Blanc", "Bleu Nuit", "Bleu Ciel", "Rouge", "Bordeaux",
+  "Vert", "Kaki", "Gris", "Beige", "Marron", "Rose", "Orange", "Violet", "Crème",
+];
+
 interface LineEntry {
   articleId: string;
   quantity: string;
@@ -138,12 +143,16 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
                       placeholder="Qté"
                       className="text-xs sm:text-sm"
                     />
-                    <Input
-                      value={line.color}
-                      onChange={(e) => updateLine(index, "color", e.target.value)}
-                      placeholder="Couleur"
-                      className="text-xs sm:text-sm"
-                    />
+                    <Select value={line.color} onValueChange={(v) => updateLine(index, "color", v)}>
+                      <SelectTrigger className="text-xs sm:text-sm">
+                        <SelectValue placeholder="Couleur" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COLORS.map((c) => (
+                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Input
                       value={line.detail}
                       onChange={(e) => updateLine(index, "detail", e.target.value)}
