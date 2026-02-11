@@ -1,5 +1,4 @@
 import { lovable } from "@/integrations/lovable/index";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Scissors } from "lucide-react";
 import { useState } from "react";
@@ -11,35 +10,12 @@ export default function Auth() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError(null);
-
     try {
-      // Check if we're inside the Lovable iframe
-      let isInIframe = false;
-      try {
-        isInIframe = window.self !== window.top;
-      } catch {
-        isInIframe = true;
-      }
-
-      if (isInIframe) {
-        // Use Lovable managed OAuth (popup flow) when in iframe
-        const result = await lovable.auth.signInWithOAuth("google", {
-          redirect_uri: window.location.origin,
-        });
-        if (result.error) {
-          setError(result.error.message);
-        }
-      } else {
-        // Direct Supabase OAuth for standalone tabs
-        const { error: oauthError } = await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo: window.location.origin,
-          },
-        });
-        if (oauthError) {
-          setError(oauthError.message);
-        }
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        setError(result.error.message);
       }
     } catch (err: any) {
       setError(err.message || "Erreur de connexion");
