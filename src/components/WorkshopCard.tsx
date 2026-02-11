@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article, updateProduction, deleteProduction, getArticles } from "@/lib/data";
+import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article, updateProduction, deleteProduction } from "@/lib/data";
 import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2, Send } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 

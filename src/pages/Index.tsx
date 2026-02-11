@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { WORKSHOPS, getArticles, getProduction, getWeekRange } from "@/lib/data";
+import { WORKSHOPS, getProduction, getWeekRange } from "@/lib/data";
+import { useArticles } from "@/hooks/useArticles";
 import WorkshopCard from "@/components/WorkshopCard";
 import ProductionTable from "@/components/ProductionTable";
 import AddProductionDialog from "@/components/AddProductionDialog";
@@ -10,7 +11,7 @@ const Index = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
-  const articles = getArticles();
+  const { articles, addArticle, deleteArticle } = useArticles();
   const production = getProduction();
   const { start, end } = getWeekRange();
 
@@ -34,7 +35,7 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <ArticleManager onChanged={refresh} />
+            <ArticleManager articles={articles} onAdd={addArticle} onDelete={deleteArticle} />
             <AddProductionDialog onAdded={refresh} />
           </div>
         </div>
