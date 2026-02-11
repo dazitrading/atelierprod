@@ -1,14 +1,17 @@
 import { WORKSHOPS, getWeekRange } from "@/lib/data";
 import { useArticles } from "@/hooks/useArticles";
 import { useProduction } from "@/hooks/useProduction";
+import { useAuth } from "@/hooks/useAuth";
 import WorkshopCard from "@/components/WorkshopCard";
 import ProductionTable from "@/components/ProductionTable";
 import AddProductionDialog from "@/components/AddProductionDialog";
 import ArticleManager from "@/components/ArticleManager";
-import { Scissors } from "lucide-react";
+import { Scissors, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const { articles, addArticle, deleteArticle } = useArticles();
+  const { signOut } = useAuth();
   const { production, fetchProduction, addProduction, updateProduction, deleteProduction } = useProduction();
   const { start, end } = getWeekRange();
 
@@ -30,6 +33,9 @@ const Index = () => {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <ArticleManager articles={articles} onAdd={addArticle} onDelete={deleteArticle} />
             <AddProductionDialog onAdded={fetchProduction} addProduction={addProduction} articles={articles} />
+            <Button variant="ghost" size="icon" onClick={signOut} title="Se déconnecter">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </header>

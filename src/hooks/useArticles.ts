@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Article } from "@/lib/data";
+import { useAuth } from "@/hooks/useAuth";
 
 export function useArticles() {
+  const { user } = useAuth();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +27,8 @@ export function useArticles() {
   }, [fetchArticles]);
 
   const addArticle = useCallback(async (article: Omit<Article, "id">) => {
-    const { error } = await supabase.from("articles").insert({ name: article.name, price: article.price });
+    if (!user) throw new Error("Not authenticated");
+    const { error } = await supabase.from("articles").insert({ name: article.name, price: article.price, user_id: user.id });
     if (error) {
       console.error("Error adding article:", error);
       throw error;
