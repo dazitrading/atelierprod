@@ -29,7 +29,7 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <ArticleManager articles={articles} onAdd={addArticle} onDelete={deleteArticle} />
-            <AddProductionDialog onAdded={fetchProduction} addProduction={addProduction} />
+            <AddProductionDialog onAdded={fetchProduction} addProduction={addProduction} articles={articles} />
           </div>
         </div>
       </header>
