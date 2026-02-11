@@ -5,16 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import { WORKSHOPS, type ProductionEntry } from "@/lib/data";
-import { useArticles } from "@/hooks/useArticles";
+import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
 
 interface Props {
   onAdded: () => void;
   addProduction: (entry: Omit<ProductionEntry, "id">) => Promise<void>;
+  articles: Article[];
 }
 
-export default function AddProductionDialog({ onAdded, addProduction }: Props) {
+export default function AddProductionDialog({ onAdded, addProduction, articles }: Props) {
   const [open, setOpen] = useState(false);
   const [workshopId, setWorkshopId] = useState("");
   const [articleId, setArticleId] = useState("");
@@ -22,8 +22,6 @@ export default function AddProductionDialog({ onAdded, addProduction }: Props) {
   const [color, setColor] = useState("");
   const [detail, setDetail] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-
-  const { articles } = useArticles();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
