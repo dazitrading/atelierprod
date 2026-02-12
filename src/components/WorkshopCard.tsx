@@ -86,10 +86,10 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
       const art = articleMap.get(entry.articleId);
       if (art) {
         const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-        msg += `• ${date} — ${art.name}: ${entry.quantity} × ${art.price.toLocaleString()} DA = ${(entry.quantity * art.price).toLocaleString()} DA\n`;
+        msg += `• ${date} — ${art.name}: ${entry.quantity} × ${art.price.toLocaleString()} DH = ${(entry.quantity * art.price).toLocaleString()} DH\n`;
       }
     }
-    msg += `\n📦 Total articles: ${totalItems}\n💰 Montant total: ${totalAmount.toLocaleString()} DA`;
+    msg += `\n📦 Total articles: ${totalItems}\n💰 Montant total: ${totalAmount.toLocaleString()} DH`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
@@ -124,7 +124,7 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
             <Banknote className="h-4 w-4 text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Montant</p>
-              <p className="font-display font-bold text-xl">{totalAmount.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">DA</span></p>
+              <p className="font-display font-bold text-xl">{totalAmount.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">DH</span></p>
             </div>
           </div>
         </div>
@@ -179,11 +179,11 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
                     {article?.name || "—"}
                   </span>
                   <span className="text-sm font-semibold">{entry.quantity}</span>
-                  <span className="text-xs text-muted-foreground">× {article?.price.toLocaleString()} DA</span>
+                  <span className="text-xs text-muted-foreground">× {article?.price.toLocaleString()} DH</span>
                   <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex gap-0.5 transition-opacity">
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700" onClick={() => {
                       const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name}: ${entry.quantity} × ${article?.price?.toLocaleString()} DA = ${(entry.quantity * (article?.price || 0)).toLocaleString()} DA`;
+                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name}: ${entry.quantity} × ${article?.price?.toLocaleString()} DH = ${(entry.quantity * (article?.price || 0)).toLocaleString()} DH`;
                       if (entry.color) msg += `\n🎨 Couleur: ${entry.color}`;
                       if (entry.detail) msg += `\n📝 Détails: ${entry.detail}`;
                       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");

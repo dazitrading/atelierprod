@@ -68,14 +68,14 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                   <TableCell className="font-medium">{workshop?.name || "—"}</TableCell>
                   <TableCell>{article?.name || "—"}</TableCell>
                   <TableCell className="text-right font-display font-semibold">{entry.quantity}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{article?.price.toLocaleString() || "—"} DA</TableCell>
-                  <TableCell className="text-right font-display font-semibold">{total.toLocaleString()} DA</TableCell>
+                  <TableCell className="text-right text-muted-foreground">{article?.price.toLocaleString() || "—"} DH</TableCell>
+                  <TableCell className="text-right font-display font-semibold">{total.toLocaleString()} DH</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" title="Envoyer par WhatsApp" onClick={() => {
                       const date = new Date(entry.date).toLocaleDateString("fr-FR");
                       const colorLine = entry.color ? `\n🎨 Couleur: ${entry.color}` : "";
                       const detailLine = entry.detail ? `\n📝 Détails: ${entry.detail}` : "";
-                      const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DA\n💰 Total: ${total.toLocaleString()} DA`;
+                      const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DH\n💰 Total: ${total.toLocaleString()} DH`;
                       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
                     }}>
                       <Send className="h-3.5 w-3.5" />
@@ -111,7 +111,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                     const date = new Date(entry.date).toLocaleDateString("fr-FR");
                     const colorLine = entry.color ? `\n🎨 Couleur: ${entry.color}` : "";
                     const detailLine = entry.detail ? `\n📝 Détails: ${entry.detail}` : "";
-                    const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DA\n💰 Total: ${total.toLocaleString()} DA`;
+                    const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DH\n💰 Total: ${total.toLocaleString()} DH`;
                     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
                   }}>
                     <Send className="h-3.5 w-3.5" />
@@ -127,7 +127,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span>{entry.quantity} {article?.name || "—"}</span>
-                <span className="font-display font-semibold">{total.toLocaleString()} DA</span>
+                <span className="font-display font-semibold">{total.toLocaleString()} DH</span>
               </div>
             </div>
           );

@@ -81,13 +81,13 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
         if (art) {
           const lineTotal = Number(line.quantity) * art.price;
           grandTotal += lineTotal;
-          msg += `• ${art.name} | Qté: ${Number(line.quantity)} | Prix: ${art.price.toLocaleString()} DA | Total: ${lineTotal.toLocaleString()} DA`;
+          msg += `• ${art.name} | Qté: ${Number(line.quantity)} | Prix: ${art.price.toLocaleString()} DH | Total: ${lineTotal.toLocaleString()} DH`;
           if (line.color.trim()) msg += ` 🎨 ${line.color.trim()}`;
           if (line.detail.trim()) msg += ` 📝 ${line.detail.trim()}`;
           msg += `\n`;
         }
       }
-      msg += `\n💰 *Total: ${grandTotal.toLocaleString()} DA*`;
+      msg += `\n💰 *Total: ${grandTotal.toLocaleString()} DH*`;
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
 
       setWorkshopId("");
