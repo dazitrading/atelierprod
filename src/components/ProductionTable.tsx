@@ -126,7 +126,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                 <span className="text-sm">{article?.name || "—"}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span>{entry.quantity} × {article?.price.toLocaleString() || "—"} DA</span>
+                <span>{entry.quantity} {article?.name || "—"}</span>
                 <span className="font-display font-semibold">{total.toLocaleString()} DA</span>
               </div>
             </div>
