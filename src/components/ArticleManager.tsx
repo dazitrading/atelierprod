@@ -119,7 +119,7 @@ export default function ArticleManager({ articles, onAdd, onUpdate, onDelete }: 
               ) : (
                 <>
                   <span className="text-sm font-medium flex-1">{a.name}</span>
-                  <span className="text-sm text-muted-foreground">{a.price.toLocaleString()} DA</span>
+                  <span className="text-sm text-muted-foreground">{a.price.toLocaleString()} DH</span>
                   <button onClick={() => startEdit(a)} className="text-muted-foreground hover:text-primary transition-colors">
                     <Pencil className="h-4 w-4" />
                   </button>
