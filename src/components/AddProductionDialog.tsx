@@ -81,7 +81,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
         if (art) {
           const lineTotal = Number(line.quantity) * art.price;
           grandTotal += lineTotal;
-          msg += `• ${art.name}: ${Number(line.quantity)} × ${art.price.toLocaleString()} DA = ${lineTotal.toLocaleString()} DA`;
+          msg += `• ${art.name} | Qté: ${Number(line.quantity)} | Prix: ${art.price.toLocaleString()} DA | Total: ${lineTotal.toLocaleString()} DA`;
           if (line.color.trim()) msg += ` 🎨 ${line.color.trim()}`;
           if (line.detail.trim()) msg += ` 📝 ${line.detail.trim()}`;
           msg += `\n`;
