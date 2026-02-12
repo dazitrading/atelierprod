@@ -9,8 +9,8 @@ import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
 
 const COLORS = [
-  "Noir", "Blanc", "Bleu Nuit", "Bleu Ciel", "Rouge", "Bordeaux",
-  "Vert", "Kaki", "Gris", "Beige", "Marron", "Rose", "Orange", "Violet", "Crème",
+  "Noir", "Blanc", "Bleu Nuit", "Bleu Ciel", "Bleu Roi", "Rouge", "Bordeaux",
+  "Vert", "Gris", "Beige", "Marron", "Rose", "Orange",
 ];
 
 interface LineEntry {
