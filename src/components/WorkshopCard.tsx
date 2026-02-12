@@ -86,7 +86,7 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
       const art = articleMap.get(entry.articleId);
       if (art) {
         const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-        msg += `• ${date} — ${art.name}: ${entry.quantity} × ${art.price.toLocaleString()} DH = ${(entry.quantity * art.price).toLocaleString()} DH\n`;
+        msg += `• ${date} — ${art.name} | Qté: ${entry.quantity} | Prix: ${art.price.toLocaleString()} DH | Total: ${(entry.quantity * art.price).toLocaleString()} DH\n`;
       }
     }
     msg += `\n📦 Total articles: ${totalItems}\n💰 Montant total: ${totalAmount.toLocaleString()} DH`;
@@ -183,7 +183,7 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
                   <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex gap-0.5 transition-opacity">
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700" onClick={() => {
                       const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name}: ${entry.quantity} × ${article?.price?.toLocaleString()} DH = ${(entry.quantity * (article?.price || 0)).toLocaleString()} DH`;
+                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name} | Qté: ${entry.quantity} | Prix: ${article?.price?.toLocaleString()} DH | Total: ${(entry.quantity * (article?.price || 0)).toLocaleString()} DH`;
                       if (entry.color) msg += `\n🎨 Couleur: ${entry.color}`;
                       if (entry.detail) msg += `\n📝 Détails: ${entry.detail}`;
                       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
