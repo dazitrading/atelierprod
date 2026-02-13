@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Send } from "lucide-react";
 import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
+import { openWhatsApp } from "@/lib/whatsapp";
 
 interface Props {
   production: ProductionEntry[];
@@ -76,7 +77,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                       const colorLine = entry.color ? `\n🎨 Couleur: ${entry.color}` : "";
                       const detailLine = entry.detail ? `\n📝 Détails: ${entry.detail}` : "";
                       const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DH\n💰 Total: ${total.toLocaleString()} DH`;
-                      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                      openWhatsApp(msg);
                     }}>
                       <Send className="h-3.5 w-3.5" />
                     </Button>
@@ -112,7 +113,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                     const colorLine = entry.color ? `\n🎨 Couleur: ${entry.color}` : "";
                     const detailLine = entry.detail ? `\n📝 Détails: ${entry.detail}` : "";
                     const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DH\n💰 Total: ${total.toLocaleString()} DH`;
-                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                    openWhatsApp(msg);
                   }}>
                     <Send className="h-3.5 w-3.5" />
                   </Button>

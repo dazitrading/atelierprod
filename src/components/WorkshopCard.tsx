@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article } from "@/lib/data";
+import { openWhatsApp } from "@/lib/whatsapp";
 import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2, Send } from "lucide-react";
 import { getArticleIcon } from "./UniformIcons";
 import { toast } from "@/hooks/use-toast";
@@ -95,7 +96,7 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
       }
     }
     msg += `\n📦 Total articles: ${totalItems}\n💰 Montant total: ${totalAmount.toLocaleString()} DH`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+    openWhatsApp(msg);
   };
 
   return (
@@ -199,7 +200,7 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
                       let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name} | Qté: ${entry.quantity} | Prix: ${article?.price?.toLocaleString()} DH | Total: ${(entry.quantity * (article?.price || 0)).toLocaleString()} DH`;
                       if (entry.color) msg += `\n🎨 Couleur: ${entry.color}`;
                       if (entry.detail) msg += `\n📝 Détails: ${entry.detail}`;
-                      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                      openWhatsApp(msg);
                     }} title="Envoyer par WhatsApp">
                       <Send className="h-3 w-3" />
                     </Button>
