@@ -71,25 +71,6 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
       }
       toast({ title: "Production ajoutée", description: `${validLines.length} entrée(s) enregistrée(s).` });
 
-      // Build WhatsApp message with all lines
-      const workshopName = WORKSHOPS.find((w) => w.id === workshopId)?.name || "—";
-      const dateFormatted = new Date(date).toLocaleDateString("fr-FR");
-      let msg = `📋 *Production du ${dateFormatted}*\n🏭 Atelier: ${workshopName}\n\n`;
-      let grandTotal = 0;
-      for (const line of validLines) {
-        const art = articles.find((a) => a.id === line.articleId);
-        if (art) {
-          const lineTotal = Number(line.quantity) * art.price;
-          grandTotal += lineTotal;
-          msg += `• ${art.name} | Qté: ${Number(line.quantity)} | Prix: ${art.price.toLocaleString()} DH | Total: ${lineTotal.toLocaleString()} DH`;
-          if (line.color.trim()) msg += ` 🎨 ${line.color.trim()}`;
-          if (line.detail.trim()) msg += ` 📝 ${line.detail.trim()}`;
-          msg += `\n`;
-        }
-      }
-      msg += `\n💰 *Total: ${grandTotal.toLocaleString()} DH*`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-
       setWorkshopId("");
       setLines([emptyLine()]);
       setOpen(false);
