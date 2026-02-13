@@ -40,6 +40,19 @@ export default function OrderSection({ workshopId, workshopName, articles, order
   const workshopOrders = orders.filter((o) => o.workshopId === workshopId);
   const articleMap = new Map(workshopArticles.map((a) => [a.id, a]));
 
+  // Auto-compute next order number
+  const getNextOrderNumber = () => {
+    const nums = workshopOrders
+      .map((o) => parseInt(o.orderNumber || "0", 10))
+      .filter((n) => !isNaN(n));
+    return String((nums.length > 0 ? Math.max(...nums) : 0) + 1);
+  };
+
+  const handleOpenChange = (v: boolean) => {
+    setOpen(v);
+    if (v) setOrderNumber(getNextOrderNumber());
+  };
+
   const handleAdd = async () => {
     if (!articleId || !quantity || Number(quantity) <= 0) {
       toast({ title: "Erreur", description: "Remplissez article et quantité.", variant: "destructive" });
@@ -60,7 +73,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
       setQuantity("");
       setColor("");
       setDetail("");
-      setOrderNumber("");
+      setOrderNumber(String(Number(orderNumber || "0") + 1));
       toast({ title: "Commande ajoutée" });
     } catch {
       toast({ title: "Erreur", variant: "destructive" });
@@ -129,7 +142,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" className="h-8 w-8" title="Bon de commande">
           <ClipboardList className="h-4 w-4" />
