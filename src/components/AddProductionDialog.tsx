@@ -148,7 +148,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
                       <SelectTrigger className="text-xs sm:text-sm">
                         <SelectValue placeholder="Couleur" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent position="popper" side="bottom" align="start" className="max-h-[60vh] z-50">
                         {COLORS.map((c) => (
                           <SelectItem key={c} value={c}>{c}</SelectItem>
                         ))}
