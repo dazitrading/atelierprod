@@ -9,6 +9,8 @@ import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, T
 import { getArticleIcon } from "./UniformIcons";
 import { toast } from "@/hooks/use-toast";
 import ArticleManager from "./ArticleManager";
+import OrderSection from "./OrderSection";
+import { type Order } from "@/hooks/useOrders";
 
 const WORKSHOP_COLORS: Record<string, string> = {
   "atelier-1": "bg-workshop-1/10 border-workshop-1/30",
@@ -26,6 +28,7 @@ interface Props {
   workshop: Workshop;
   production: ProductionEntry[];
   articles: Article[];
+  orders: Order[];
   weekStart: string;
   weekEnd: string;
   onUpdateProduction: (id: string, updates: Partial<Omit<ProductionEntry, "id">>) => Promise<void>;
@@ -33,9 +36,11 @@ interface Props {
   onAddArticle: (article: Omit<Article, "id">) => Promise<void>;
   onUpdateArticle: (id: string, updates: Partial<Omit<Article, "id">>) => Promise<void>;
   onDeleteArticle: (id: string) => Promise<void>;
+  onAddOrder: (order: Omit<Order, "id" | "createdAt">) => Promise<void>;
+  onDeleteOrder: (id: string) => Promise<void>;
 }
 
-export default function WorkshopCard({ workshop, production, articles, weekStart, weekEnd, onUpdateProduction, onDeleteProduction, onAddArticle, onUpdateArticle, onDeleteArticle }: Props) {
+export default function WorkshopCard({ workshop, production, articles, orders, weekStart, weekEnd, onUpdateProduction, onDeleteProduction, onAddArticle, onUpdateArticle, onDeleteArticle, onAddOrder, onDeleteOrder }: Props) {
   const workshopArticles = articles.filter((a) => a.workshopId === workshop.id);
   const { totalAmount, totalItems } = getWorkshopWeeklyTotal(
     workshop.id, production, workshopArticles, weekStart, weekEnd
@@ -115,6 +120,14 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
               onAdd={onAddArticle}
               onUpdate={onUpdateArticle}
               onDelete={onDeleteArticle}
+            />
+            <OrderSection
+              workshopId={workshop.id}
+              workshopName={workshop.name}
+              articles={articles}
+              orders={orders}
+              onAddOrder={onAddOrder}
+              onDeleteOrder={onDeleteOrder}
             />
             <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" onClick={sendWhatsApp} title="Envoyer par WhatsApp">
               <Send className="h-4 w-4" />

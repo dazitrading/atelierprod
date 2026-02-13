@@ -41,6 +41,47 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          article_id: string
+          color: string | null
+          created_at: string
+          date: string
+          id: string
+          quantity: number
+          user_id: string | null
+          workshop_id: string
+        }
+        Insert: {
+          article_id: string
+          color?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          quantity: number
+          user_id?: string | null
+          workshop_id: string
+        }
+        Update: {
+          article_id?: string
+          color?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          quantity?: number
+          user_id?: string | null
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       production: {
         Row: {
           article_id: string
