@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, ClipboardList } from "lucide-react";
+import { Plus, Trash2, ClipboardList, Download } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { type Article } from "@/lib/data";
 import { type Order } from "@/hooks/useOrders";
 import { toast } from "@/hooks/use-toast";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const COLORS = [
   "Noir", "Blanc", "Bleu Nuit", "Bleu Ciel", "Bleu Roi", "Rouge", "Bordeaux",
@@ -29,6 +31,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
   const [articleId, setArticleId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [color, setColor] = useState("");
+  const [detail, setDetail] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const workshopArticles = articles.filter((a) => a.workshopId === workshopId);
@@ -47,11 +50,13 @@ export default function OrderSection({ workshopId, workshopName, articles, order
         articleId,
         quantity: Number(quantity),
         color: color || null,
+        detail: detail || null,
         date,
       });
       setArticleId("");
       setQuantity("");
       setColor("");
+      setDetail("");
       toast({ title: "Commande ajoutée" });
     } catch {
       toast({ title: "Erreur", variant: "destructive" });
@@ -69,6 +74,36 @@ export default function OrderSection({ workshopId, workshopName, articles, order
     }
   };
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(`Bon de commande — ${workshopName}`, 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, 14, 28);
+
+    const rows = workshopOrders.map((order) => {
+      const art = articleMap.get(order.articleId);
+      return [
+        new Date(order.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }),
+        art?.name || "—",
+        String(order.quantity),
+        order.color || "—",
+        order.detail || "—",
+      ];
+    });
+
+    autoTable(doc, {
+      startY: 34,
+      head: [["Date", "Article", "Quantité", "Couleur", "Détails"]],
+      body: rows,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [41, 37, 36] },
+    });
+
+    doc.save(`bon-commande-${workshopName.toLowerCase().replace(/\s+/g, "-")}.pdf`);
+    toast({ title: "PDF téléchargé" });
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -76,9 +111,17 @@ export default function OrderSection({ workshopId, workshopName, articles, order
           <ClipboardList className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display">Bon de commande — {workshopName}</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="font-display">Bon de commande — {workshopName}</DialogTitle>
+            {workshopOrders.length > 0 && (
+              <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-1.5">
+                <Download className="h-3.5 w-3.5" />
+                PDF
+              </Button>
+            )}
+          </div>
         </DialogHeader>
 
         {/* Add new order row */}
@@ -113,6 +156,10 @@ export default function OrderSection({ workshopId, workshopName, articles, order
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-1 flex-1 min-w-[120px]">
+            <label className="text-xs font-medium text-muted-foreground">Détails</label>
+            <Input value={detail} onChange={(e) => setDetail(e.target.value)} className="h-9 text-xs" placeholder="Détails…" />
+          </div>
           <Button size="sm" onClick={handleAdd} disabled={submitting} className="h-9 gap-1">
             <Plus className="h-3.5 w-3.5" />
             Ajouter
@@ -130,6 +177,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
                 <TableHead className="text-xs">Article</TableHead>
                 <TableHead className="text-xs text-right">Quantité</TableHead>
                 <TableHead className="text-xs">Couleur</TableHead>
+                <TableHead className="text-xs">Détails</TableHead>
                 <TableHead className="text-xs w-10"></TableHead>
               </TableRow>
             </TableHeader>
@@ -144,6 +192,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
                     <TableCell className="text-xs font-medium">{art?.name || "—"}</TableCell>
                     <TableCell className="text-xs text-right font-semibold">{order.quantity}</TableCell>
                     <TableCell className="text-xs">{order.color || "—"}</TableCell>
+                    <TableCell className="text-xs">{order.detail || "—"}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(order.id)}>
                         <Trash2 className="h-3 w-3" />

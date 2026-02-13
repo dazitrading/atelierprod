@@ -47,6 +47,7 @@ export type Database = {
           color: string | null
           created_at: string
           date: string
+          detail: string | null
           id: string
           quantity: number
           user_id: string | null
@@ -57,6 +58,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           date?: string
+          detail?: string | null
           id?: string
           quantity: number
           user_id?: string | null
@@ -67,6 +69,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           date?: string
+          detail?: string | null
           id?: string
           quantity?: number
           user_id?: string | null
