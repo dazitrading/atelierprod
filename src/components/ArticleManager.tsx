@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings, Plus, Trash2, Pencil, Check, X } from "lucide-react";
+import { Settings, Plus, Trash2, Pencil, Check, X, Copy } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import type { Article } from "@/lib/data";
+import { WORKSHOPS, type Article } from "@/lib/data";
 
 interface Props {
   articles: Article[];
@@ -22,8 +23,12 @@ export default function ArticleManager({ articles, workshopId, workshopName, onA
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editPrice, setEditPrice] = useState("");
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [dupWorkshopId, setDupWorkshopId] = useState("");
+  const [dupPrice, setDupPrice] = useState("");
 
   const workshopArticles = articles.filter((a) => a.workshopId === workshopId);
+  const otherWorkshops = WORKSHOPS.filter((w) => w.id !== workshopId);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +50,7 @@ export default function ArticleManager({ articles, workshopId, workshopName, onA
     setEditingId(article.id);
     setEditName(article.name);
     setEditPrice(String(article.price));
+    setDuplicatingId(null);
   };
 
   const cancelEdit = () => {
@@ -76,6 +82,38 @@ export default function ArticleManager({ articles, workshopId, workshopName, onA
     }
   };
 
+  const startDuplicate = (article: Article) => {
+    setDuplicatingId(article.id);
+    setDupWorkshopId("");
+    setDupPrice(String(article.price));
+    setEditingId(null);
+  };
+
+  const cancelDuplicate = () => {
+    setDuplicatingId(null);
+    setDupWorkshopId("");
+    setDupPrice("");
+  };
+
+  const handleDuplicate = async (article: Article) => {
+    if (!dupWorkshopId) {
+      toast({ title: "Erreur", description: "Choisissez un atelier.", variant: "destructive" });
+      return;
+    }
+    if (!dupPrice || Number(dupPrice) <= 0) {
+      toast({ title: "Erreur", description: "Prix requis.", variant: "destructive" });
+      return;
+    }
+    try {
+      await onAdd({ name: article.name, price: Number(dupPrice), workshopId: dupWorkshopId });
+      const targetName = WORKSHOPS.find((w) => w.id === dupWorkshopId)?.name;
+      cancelDuplicate();
+      toast({ title: "Article dupliqué", description: `${article.name} ajouté à ${targetName}` });
+    } catch {
+      toast({ title: "Erreur", description: "Impossible de dupliquer.", variant: "destructive" });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -92,34 +130,66 @@ export default function ArticleManager({ articles, workshopId, workshopName, onA
           <Input type="number" placeholder="Prix" value={price} onChange={(e) => setPrice(e.target.value)} className="w-24" />
           <Button type="submit" size="icon"><Plus className="h-4 w-4" /></Button>
         </form>
-        <div className="mt-2 max-h-60 space-y-1 overflow-y-auto">
+        <div className="mt-2 max-h-72 space-y-1 overflow-y-auto">
           {workshopArticles.length === 0 && (
             <p className="py-4 text-center text-sm text-muted-foreground">Aucun article pour cet atelier</p>
           )}
           {workshopArticles.map((a) => (
-            <div key={a.id} className="flex items-center justify-between rounded-md bg-secondary/50 px-3 py-2 gap-2">
-              {editingId === a.id ? (
-                <>
-                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="flex-1 h-8 text-sm" />
-                  <Input type="number" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} className="w-20 h-8 text-sm" />
-                  <button onClick={() => handleUpdate(a.id)} className="text-primary hover:text-primary/80 transition-colors">
+            <div key={a.id} className="space-y-1">
+              <div className="flex items-center justify-between rounded-md bg-secondary/50 px-3 py-2 gap-2">
+                {editingId === a.id ? (
+                  <>
+                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="flex-1 h-8 text-sm" />
+                    <Input type="number" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} className="w-20 h-8 text-sm" />
+                    <button onClick={() => handleUpdate(a.id)} className="text-primary hover:text-primary/80 transition-colors">
+                      <Check className="h-4 w-4" />
+                    </button>
+                    <button onClick={cancelEdit} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-sm font-medium flex-1">{a.name}</span>
+                    <span className="text-sm text-muted-foreground">{a.price.toLocaleString()} DH</span>
+                    <button onClick={() => startDuplicate(a)} className="text-muted-foreground hover:text-primary transition-colors" title="Dupliquer vers un autre atelier">
+                      <Copy className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => startEdit(a)} className="text-muted-foreground hover:text-primary transition-colors">
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => handleDelete(a.id)} className="text-destructive hover:text-destructive/80 transition-colors">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+              {duplicatingId === a.id && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-primary/5 border border-primary/20">
+                  <Select value={dupWorkshopId} onValueChange={setDupWorkshopId}>
+                    <SelectTrigger className="h-8 text-xs flex-1">
+                      <SelectValue placeholder="Atelier cible" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {otherWorkshops.map((w) => (
+                        <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="number"
+                    value={dupPrice}
+                    onChange={(e) => setDupPrice(e.target.value)}
+                    placeholder="Prix"
+                    className="w-20 h-8 text-xs"
+                  />
+                  <button onClick={() => handleDuplicate(a)} className="text-primary hover:text-primary/80 transition-colors">
                     <Check className="h-4 w-4" />
                   </button>
-                  <button onClick={cancelEdit} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <button onClick={cancelDuplicate} className="text-muted-foreground hover:text-foreground transition-colors">
                     <X className="h-4 w-4" />
                   </button>
-                </>
-              ) : (
-                <>
-                  <span className="text-sm font-medium flex-1">{a.name}</span>
-                  <span className="text-sm text-muted-foreground">{a.price.toLocaleString()} DH</span>
-                  <button onClick={() => startEdit(a)} className="text-muted-foreground hover:text-primary transition-colors">
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button onClick={() => handleDelete(a.id)} className="text-destructive hover:text-destructive/80 transition-colors">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </>
+                </div>
               )}
             </div>
           ))}
