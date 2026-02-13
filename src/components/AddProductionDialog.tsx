@@ -35,6 +35,8 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
   const [lines, setLines] = useState<LineEntry[]>([emptyLine()]);
   const [submitting, setSubmitting] = useState(false);
 
+  const filteredArticles = workshopId ? articles.filter((a) => a.workshopId === workshopId) : [];
+
   const updateLine = (index: number, field: keyof LineEntry, value: string) => {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, [field]: value } : l)));
   };
@@ -105,7 +107,10 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
             </div>
             <div className="space-y-2">
               <Label>Atelier</Label>
-              <Select value={workshopId} onValueChange={setWorkshopId}>
+              <Select value={workshopId} onValueChange={(v) => {
+                setWorkshopId(v);
+                setLines([emptyLine()]);
+              }}>
                 <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
                 <SelectContent>
                   {WORKSHOPS.map((w) => (
@@ -127,10 +132,10 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
                         <SelectValue placeholder="Article" />
                       </SelectTrigger>
                       <SelectContent>
-                        {articles.length === 0 ? (
-                          <div className="px-3 py-2 text-sm text-muted-foreground">Aucun article</div>
+                        {filteredArticles.length === 0 ? (
+                          <div className="px-3 py-2 text-sm text-muted-foreground">Aucun article pour cet atelier</div>
                         ) : (
-                          articles.map((a) => (
+                          filteredArticles.map((a) => (
                             <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                           ))
                         )}

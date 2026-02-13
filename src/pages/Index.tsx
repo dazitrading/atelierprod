@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/useAuth";
 import WorkshopCard from "@/components/WorkshopCard";
 import ProductionTable from "@/components/ProductionTable";
 import AddProductionDialog from "@/components/AddProductionDialog";
-import ArticleManager from "@/components/ArticleManager";
 import { Scissors, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -31,7 +30,6 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <ArticleManager articles={articles} onAdd={addArticle} onUpdate={updateArticle} onDelete={deleteArticle} />
             <AddProductionDialog onAdded={fetchProduction} addProduction={addProduction} articles={articles} />
             <Button variant="ghost" size="icon" onClick={signOut} title="Se déconnecter">
               <LogOut className="h-4 w-4" />
@@ -59,6 +57,9 @@ const Index = () => {
                 weekEnd={end}
                 onUpdateProduction={updateProduction}
                 onDeleteProduction={deleteProduction}
+                onAddArticle={addArticle}
+                onUpdateArticle={updateArticle}
+                onDeleteArticle={deleteArticle}
               />
             ))}
           </div>

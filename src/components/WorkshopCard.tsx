@@ -7,6 +7,7 @@ import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Artic
 import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2, Send } from "lucide-react";
 import { getArticleIcon } from "./UniformIcons";
 import { toast } from "@/hooks/use-toast";
+import ArticleManager from "./ArticleManager";
 
 const WORKSHOP_COLORS: Record<string, string> = {
   "atelier-1": "bg-workshop-1/10 border-workshop-1/30",
@@ -28,11 +29,15 @@ interface Props {
   weekEnd: string;
   onUpdateProduction: (id: string, updates: Partial<Omit<ProductionEntry, "id">>) => Promise<void>;
   onDeleteProduction: (id: string) => Promise<void>;
+  onAddArticle: (article: Omit<Article, "id">) => Promise<void>;
+  onUpdateArticle: (id: string, updates: Partial<Omit<Article, "id">>) => Promise<void>;
+  onDeleteArticle: (id: string) => Promise<void>;
 }
 
-export default function WorkshopCard({ workshop, production, articles, weekStart, weekEnd, onUpdateProduction, onDeleteProduction }: Props) {
+export default function WorkshopCard({ workshop, production, articles, weekStart, weekEnd, onUpdateProduction, onDeleteProduction, onAddArticle, onUpdateArticle, onDeleteArticle }: Props) {
+  const workshopArticles = articles.filter((a) => a.workshopId === workshop.id);
   const { totalAmount, totalItems } = getWorkshopWeeklyTotal(
-    workshop.id, production, articles, weekStart, weekEnd
+    workshop.id, production, workshopArticles, weekStart, weekEnd
   );
 
   const [expanded, setExpanded] = useState(false);
@@ -44,7 +49,7 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
     .filter((e) => e.workshopId === workshop.id && e.date >= weekStart && e.date <= weekEnd)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  const articleMap = new Map(articles.map((a) => [a.id, a]));
+  const articleMap = new Map(workshopArticles.map((a) => [a.id, a]));
 
   const startEdit = (entry: ProductionEntry) => {
     setEditingId(entry.id);
@@ -102,6 +107,14 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
           </div>
           <h3 className="font-display font-semibold text-lg flex-1">{workshop.name}</h3>
           <div className="flex items-center gap-1">
+            <ArticleManager
+              articles={articles}
+              workshopId={workshop.id}
+              workshopName={workshop.name}
+              onAdd={onAddArticle}
+              onUpdate={onUpdateArticle}
+              onDelete={onDeleteArticle}
+            />
             <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" onClick={sendWhatsApp} title="Envoyer par WhatsApp">
               <Send className="h-4 w-4" />
             </Button>
@@ -147,7 +160,7 @@ export default function WorkshopCard({ workshop, production, articles, weekStart
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {articles.map((a) => (
+                        {workshopArticles.map((a) => (
                           <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                         ))}
                       </SelectContent>

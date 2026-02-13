@@ -21,6 +21,7 @@ export type Database = {
           name: string
           price: number
           user_id: string | null
+          workshop_id: string
         }
         Insert: {
           created_at?: string
@@ -28,6 +29,7 @@ export type Database = {
           name: string
           price: number
           user_id?: string | null
+          workshop_id: string
         }
         Update: {
           created_at?: string
@@ -35,6 +37,7 @@ export type Database = {
           name?: string
           price?: number
           user_id?: string | null
+          workshop_id?: string
         }
         Relationships: []
       }

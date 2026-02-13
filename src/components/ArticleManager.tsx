@@ -8,18 +8,22 @@ import type { Article } from "@/lib/data";
 
 interface Props {
   articles: Article[];
+  workshopId: string;
+  workshopName: string;
   onAdd: (article: Omit<Article, "id">) => Promise<void>;
   onUpdate: (id: string, updates: Partial<Omit<Article, "id">>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
 
-export default function ArticleManager({ articles, onAdd, onUpdate, onDelete }: Props) {
+export default function ArticleManager({ articles, workshopId, workshopName, onAdd, onUpdate, onDelete }: Props) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editPrice, setEditPrice] = useState("");
+
+  const workshopArticles = articles.filter((a) => a.workshopId === workshopId);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +32,7 @@ export default function ArticleManager({ articles, onAdd, onUpdate, onDelete }: 
       return;
     }
     try {
-      await onAdd({ name: name.trim(), price: Number(price) });
+      await onAdd({ name: name.trim(), price: Number(price), workshopId });
       setName("");
       setPrice("");
       toast({ title: "Article ajouté" });
@@ -75,15 +79,13 @@ export default function ArticleManager({ articles, onAdd, onUpdate, onDelete }: 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 text-xs sm:text-sm">
-          <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Articles</span>
-          <span className="sm:hidden">Art.</span>
+        <Button variant="ghost" size="icon" className="h-8 w-8" title={`Articles ${workshopName}`}>
+          <Settings className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display">Gérer les articles</DialogTitle>
+          <DialogTitle className="font-display">Articles — {workshopName}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleAdd} className="flex gap-2 pt-2">
           <Input placeholder="Nom de l'article" value={name} onChange={(e) => setName(e.target.value)} className="flex-1" />
@@ -91,24 +93,15 @@ export default function ArticleManager({ articles, onAdd, onUpdate, onDelete }: 
           <Button type="submit" size="icon"><Plus className="h-4 w-4" /></Button>
         </form>
         <div className="mt-2 max-h-60 space-y-1 overflow-y-auto">
-          {articles.length === 0 && (
-            <p className="py-4 text-center text-sm text-muted-foreground">Aucun article configuré</p>
+          {workshopArticles.length === 0 && (
+            <p className="py-4 text-center text-sm text-muted-foreground">Aucun article pour cet atelier</p>
           )}
-          {articles.map((a) => (
+          {workshopArticles.map((a) => (
             <div key={a.id} className="flex items-center justify-between rounded-md bg-secondary/50 px-3 py-2 gap-2">
               {editingId === a.id ? (
                 <>
-                  <Input
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    className="flex-1 h-8 text-sm"
-                  />
-                  <Input
-                    type="number"
-                    value={editPrice}
-                    onChange={(e) => setEditPrice(e.target.value)}
-                    className="w-20 h-8 text-sm"
-                  />
+                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="flex-1 h-8 text-sm" />
+                  <Input type="number" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} className="w-20 h-8 text-sm" />
                   <button onClick={() => handleUpdate(a.id)} className="text-primary hover:text-primary/80 transition-colors">
                     <Check className="h-4 w-4" />
                   </button>
