@@ -8,6 +8,7 @@ export interface Order {
   quantity: number;
   color: string | null;
   detail: string | null;
+  orderNumber: string | null;
   date: string;
   createdAt: string;
 }
@@ -29,6 +30,7 @@ export function useOrders() {
           quantity: r.quantity,
           color: r.color,
           detail: r.detail,
+          orderNumber: r.order_number,
           date: r.date,
           createdAt: r.created_at,
         }))
@@ -49,6 +51,7 @@ export function useOrders() {
       quantity: order.quantity,
       color: order.color,
       detail: order.detail,
+      order_number: order.orderNumber,
       date: order.date,
       user_id: userId,
     });

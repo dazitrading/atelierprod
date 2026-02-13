@@ -33,6 +33,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
   const [quantity, setQuantity] = useState("");
   const [color, setColor] = useState("");
   const [detail, setDetail] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const workshopArticles = articles.filter((a) => a.workshopId === workshopId);
@@ -52,12 +53,14 @@ export default function OrderSection({ workshopId, workshopName, articles, order
         quantity: Number(quantity),
         color: color || null,
         detail: detail || null,
+        orderNumber: orderNumber || null,
         date,
       });
       setArticleId("");
       setQuantity("");
       setColor("");
       setDetail("");
+      setOrderNumber("");
       toast({ title: "Commande ajoutée" });
     } catch {
       toast({ title: "Erreur", variant: "destructive" });
@@ -85,6 +88,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
     const rows = workshopOrders.map((order) => {
       const art = articleMap.get(order.articleId);
       return [
+        order.orderNumber || "—",
         new Date(order.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }),
         art?.name || "—",
         String(order.quantity),
@@ -95,7 +99,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
 
     autoTable(doc, {
       startY: 34,
-      head: [["Date", "Article", "Quantité", "Couleur", "Détails"]],
+      head: [["BC N°", "Date", "Article", "Quantité", "Couleur", "Détails"]],
       body: rows,
       styles: { fontSize: 9 },
       headStyles: { fillColor: [41, 37, 36] },
@@ -109,7 +113,9 @@ export default function OrderSection({ workshopId, workshopName, articles, order
     const lines = workshopOrders.map((order) => {
       const art = articleMap.get(order.articleId);
       const dateFmt = new Date(order.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+      const bcLabel = order.orderNumber ? `BC ${order.orderNumber}` : "";
       const parts = [
+        bcLabel,
         `📦 ${art?.name || "—"}`,
         `× ${order.quantity}`,
         order.color || "",
@@ -150,6 +156,10 @@ export default function OrderSection({ workshopId, workshopName, articles, order
 
         {/* Add new order row */}
         <div className="flex flex-wrap items-end gap-2 p-3 rounded-lg border bg-muted/30">
+          <div className="space-y-1 w-20">
+            <label className="text-xs font-medium text-muted-foreground">BC N°</label>
+            <Input value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} className="h-9 text-xs" placeholder="N°" />
+          </div>
           <div className="space-y-1">
             <label className="text-xs font-medium text-muted-foreground">Date</label>
             <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-9 w-36 text-xs" />
@@ -196,7 +206,8 @@ export default function OrderSection({ workshopId, workshopName, articles, order
         ) : (
           <Table>
             <TableHeader>
-              <TableRow>
+            <TableRow>
+                <TableHead className="text-xs">BC N°</TableHead>
                 <TableHead className="text-xs">Date</TableHead>
                 <TableHead className="text-xs">Article</TableHead>
                 <TableHead className="text-xs text-right">Quantité</TableHead>
@@ -210,6 +221,7 @@ export default function OrderSection({ workshopId, workshopName, articles, order
                 const art = articleMap.get(order.articleId);
                 return (
                   <TableRow key={order.id}>
+                    <TableCell className="text-xs font-medium">{order.orderNumber || "—"}</TableCell>
                     <TableCell className="text-xs">
                       {new Date(order.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
                     </TableCell>
