@@ -2,6 +2,7 @@ export interface Article {
   id: string;
   name: string;
   price: number;
+  workshopId: string;
 }
 
 export interface ProductionEntry {

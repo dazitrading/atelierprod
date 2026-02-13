@@ -9,14 +9,14 @@ export function useArticles() {
   const fetchArticles = useCallback(async () => {
     const { data, error } = await supabase
       .from("articles")
-      .select("id, name, price")
+      .select("id, name, price, workshop_id")
       .order("created_at", { ascending: true });
 
     if (error) {
       console.error("Error fetching articles:", error);
       return;
     }
-    setArticles((data || []).map((a) => ({ id: a.id, name: a.name, price: Number(a.price) })));
+    setArticles((data || []).map((a) => ({ id: a.id, name: a.name, price: Number(a.price), workshopId: a.workshop_id })));
     setLoading(false);
   }, []);
 
@@ -27,7 +27,12 @@ export function useArticles() {
   const addArticle = useCallback(async (article: Omit<Article, "id">) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) throw new Error("Not authenticated");
-    const { error } = await supabase.from("articles").insert({ name: article.name, price: article.price, user_id: session.user.id });
+    const { error } = await supabase.from("articles").insert({
+      name: article.name,
+      price: article.price,
+      workshop_id: article.workshopId,
+      user_id: session.user.id,
+    });
     if (error) {
       console.error("Error adding article:", error);
       throw error;
@@ -36,7 +41,11 @@ export function useArticles() {
   }, [fetchArticles]);
 
   const updateArticle = useCallback(async (id: string, updates: Partial<Omit<Article, "id">>) => {
-    const { error } = await supabase.from("articles").update(updates).eq("id", id);
+    const dbUpdates: Record<string, unknown> = {};
+    if (updates.name !== undefined) dbUpdates.name = updates.name;
+    if (updates.price !== undefined) dbUpdates.price = updates.price;
+    if (updates.workshopId !== undefined) dbUpdates.workshop_id = updates.workshopId;
+    const { error } = await supabase.from("articles").update(dbUpdates).eq("id", id);
     if (error) {
       console.error("Error updating article:", error);
       throw error;
@@ -53,5 +62,9 @@ export function useArticles() {
     await fetchArticles();
   }, [fetchArticles]);
 
-  return { articles, loading, fetchArticles, addArticle, updateArticle, deleteArticle };
+  const getArticlesForWorkshop = useCallback((workshopId: string) => {
+    return articles.filter((a) => a.workshopId === workshopId);
+  }, [articles]);
+
+  return { articles, loading, fetchArticles, addArticle, updateArticle, deleteArticle, getArticlesForWorkshop };
 }
