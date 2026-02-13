@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, ClipboardList, Download } from "lucide-react";
+import { Plus, Trash2, ClipboardList, Download, Send } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { type Article } from "@/lib/data";
 import { type Order } from "@/hooks/useOrders";
 import { toast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { openWhatsApp } from "@/lib/whatsapp";
 
 const COLORS = [
   "Noir", "Blanc", "Bleu Nuit", "Bleu Ciel", "Bleu Roi", "Rouge", "Bordeaux",
@@ -104,6 +105,23 @@ export default function OrderSection({ workshopId, workshopName, articles, order
     toast({ title: "PDF téléchargé" });
   };
 
+  const handleShareWhatsApp = () => {
+    const lines = workshopOrders.map((order) => {
+      const art = articleMap.get(order.articleId);
+      const dateFmt = new Date(order.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+      const parts = [
+        `📦 ${art?.name || "—"}`,
+        `× ${order.quantity}`,
+        order.color || "",
+        order.detail || "",
+      ].filter(Boolean);
+      return `${dateFmt} — ${parts.join(" | ")}`;
+    });
+
+    const message = `📋 *Bon de commande — ${workshopName}*\n${new Date().toLocaleDateString("fr-FR")}\n\n${lines.join("\n")}`;
+    openWhatsApp(message);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -116,10 +134,16 @@ export default function OrderSection({ workshopId, workshopName, articles, order
           <div className="flex items-center justify-between">
             <DialogTitle className="font-display">Bon de commande — {workshopName}</DialogTitle>
             {workshopOrders.length > 0 && (
-              <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-1.5">
-                <Download className="h-3.5 w-3.5" />
-                PDF
-              </Button>
+              <div className="flex gap-1.5">
+                <Button variant="outline" size="sm" onClick={handleShareWhatsApp} className="gap-1.5">
+                  <Send className="h-3.5 w-3.5" />
+                  WhatsApp
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-1.5">
+                  <Download className="h-3.5 w-3.5" />
+                  PDF
+                </Button>
+              </div>
             )}
           </div>
         </DialogHeader>
