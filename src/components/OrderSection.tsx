@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, ClipboardList, Download, Send } from "lucide-react";
+import { Plus, Trash2, ClipboardList, Download, Send, Printer } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { type Article } from "@/lib/data";
 import { type Order } from "@/hooks/useOrders";
 import { toast } from "@/hooks/use-toast";
@@ -35,11 +36,33 @@ export default function OrderSection({ workshopId, workshopName, articles, order
   const [detail, setDetail] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
+  const [selectedBCs, setSelectedBCs] = useState<Set<string>>(new Set());
   const workshopArticles = articles.filter((a) => a.workshopId === workshopId);
   const workshopOrders = orders.filter((o) => o.workshopId === workshopId);
   const articleMap = new Map(workshopArticles.map((a) => [a.id, a]));
 
+  // Unique BC numbers for selection
+  const uniqueBCNumbers = useMemo(() => {
+    const nums = [...new Set(workshopOrders.map((o) => o.orderNumber).filter(Boolean))] as string[];
+    return nums.sort((a, b) => parseInt(a) - parseInt(b));
+  }, [workshopOrders]);
+
+  const toggleBC = (bc: string) => {
+    setSelectedBCs((prev) => {
+      const next = new Set(prev);
+      if (next.has(bc)) next.delete(bc);
+      else next.add(bc);
+      return next;
+    });
+  };
+
+  const toggleAllBCs = () => {
+    if (selectedBCs.size === uniqueBCNumbers.length) {
+      setSelectedBCs(new Set());
+    } else {
+      setSelectedBCs(new Set(uniqueBCNumbers));
+    }
+  };
   // Auto-compute next order number
   const getNextOrderNumber = () => {
     const nums = workshopOrders
@@ -91,14 +114,18 @@ export default function OrderSection({ workshopId, workshopName, articles, order
     }
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = (filteredOrders?: Order[]) => {
+    const ordersToExport = filteredOrders || workshopOrders;
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text(`Bon de commande — ${workshopName}`, 14, 20);
+    const bcLabel = filteredOrders
+      ? `Bon de commande N° ${[...selectedBCs].sort((a, b) => parseInt(a) - parseInt(b)).join(", ")} — ${workshopName}`
+      : `Bon de commande — ${workshopName}`;
+    doc.text(bcLabel, 14, 20);
     doc.setFontSize(10);
     doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, 14, 28);
 
-    const rows = workshopOrders.map((order) => {
+    const rows = ordersToExport.map((order) => {
       const art = articleMap.get(order.articleId);
       return [
         order.orderNumber || "—",
@@ -120,6 +147,15 @@ export default function OrderSection({ workshopId, workshopName, articles, order
 
     doc.save(`bon-commande-${workshopName.toLowerCase().replace(/\s+/g, "-")}.pdf`);
     toast({ title: "PDF téléchargé" });
+  };
+
+  const handlePrintSelectedPDF = () => {
+    if (selectedBCs.size === 0) {
+      toast({ title: "Sélectionnez au moins un BC N°", variant: "destructive" });
+      return;
+    }
+    const filtered = workshopOrders.filter((o) => o.orderNumber && selectedBCs.has(o.orderNumber));
+    handleDownloadPDF(filtered);
   };
 
   const handleShareWhatsApp = () => {
@@ -154,11 +190,17 @@ export default function OrderSection({ workshopId, workshopName, articles, order
             <DialogTitle className="font-display">Bon de commande — {workshopName}</DialogTitle>
             {workshopOrders.length > 0 && (
               <div className="flex gap-1.5">
+                {selectedBCs.size > 0 && (
+                  <Button variant="default" size="sm" onClick={handlePrintSelectedPDF} className="gap-1.5">
+                    <Printer className="h-3.5 w-3.5" />
+                    Imprimer BC ({selectedBCs.size})
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" onClick={handleShareWhatsApp} className="gap-1.5">
                   <Send className="h-3.5 w-3.5" />
                   WhatsApp
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-1.5">
+                <Button variant="outline" size="sm" onClick={() => handleDownloadPDF()} className="gap-1.5">
                   <Download className="h-3.5 w-3.5" />
                   PDF
                 </Button>
@@ -220,6 +262,12 @@ export default function OrderSection({ workshopId, workshopName, articles, order
           <Table>
             <TableHeader>
             <TableRow>
+                <TableHead className="text-xs w-10">
+                  <Checkbox
+                    checked={uniqueBCNumbers.length > 0 && selectedBCs.size === uniqueBCNumbers.length}
+                    onCheckedChange={toggleAllBCs}
+                  />
+                </TableHead>
                 <TableHead className="text-xs">BC N°</TableHead>
                 <TableHead className="text-xs">Date</TableHead>
                 <TableHead className="text-xs">Article</TableHead>
@@ -233,7 +281,15 @@ export default function OrderSection({ workshopId, workshopName, articles, order
               {workshopOrders.map((order) => {
                 const art = articleMap.get(order.articleId);
                 return (
-                  <TableRow key={order.id}>
+                  <TableRow key={order.id} className={order.orderNumber && selectedBCs.has(order.orderNumber) ? "bg-primary/5" : ""}>
+                    <TableCell>
+                      {order.orderNumber ? (
+                        <Checkbox
+                          checked={selectedBCs.has(order.orderNumber)}
+                          onCheckedChange={() => toggleBC(order.orderNumber!)}
+                        />
+                      ) : null}
+                    </TableCell>
                     <TableCell className="text-xs font-medium">{order.orderNumber || "—"}</TableCell>
                     <TableCell className="text-xs">
                       {new Date(order.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
