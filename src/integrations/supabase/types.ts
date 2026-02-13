@@ -49,6 +49,7 @@ export type Database = {
           date: string
           detail: string | null
           id: string
+          order_number: string | null
           quantity: number
           user_id: string | null
           workshop_id: string
@@ -60,6 +61,7 @@ export type Database = {
           date?: string
           detail?: string | null
           id?: string
+          order_number?: string | null
           quantity: number
           user_id?: string | null
           workshop_id: string
@@ -71,6 +73,7 @@ export type Database = {
           date?: string
           detail?: string | null
           id?: string
+          order_number?: string | null
           quantity?: number
           user_id?: string | null
           workshop_id?: string
