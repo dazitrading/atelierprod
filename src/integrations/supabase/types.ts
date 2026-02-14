@@ -132,6 +132,56 @@ export type Database = {
           },
         ]
       }
+      stock: {
+        Row: {
+          article_id: string
+          color: string | null
+          created_at: string
+          date: string
+          id: string
+          movement_type: string
+          note: string | null
+          quantity: number
+          size: string | null
+          user_id: string | null
+          workshop_id: string
+        }
+        Insert: {
+          article_id: string
+          color?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          movement_type?: string
+          note?: string | null
+          quantity: number
+          size?: string | null
+          user_id?: string | null
+          workshop_id: string
+        }
+        Update: {
+          article_id?: string
+          color?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          movement_type?: string
+          note?: string | null
+          quantity?: number
+          size?: string | null
+          user_id?: string | null
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

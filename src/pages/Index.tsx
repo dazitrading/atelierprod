@@ -2,10 +2,12 @@ import { WORKSHOPS, getWeekRange, getWorkshopWeeklyTotal } from "@/lib/data";
 import { useArticles } from "@/hooks/useArticles";
 import { useProduction } from "@/hooks/useProduction";
 import { useOrders } from "@/hooks/useOrders";
+import { useStock } from "@/hooks/useStock";
 import { useAuth } from "@/hooks/useAuth";
 import WorkshopCard from "@/components/WorkshopCard";
 import ProductionTable from "@/components/ProductionTable";
 import AddProductionDialog from "@/components/AddProductionDialog";
+import StockSection from "@/components/StockSection";
 import { Scissors, LogOut, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openWhatsApp } from "@/lib/whatsapp";
@@ -15,6 +17,7 @@ const Index = () => {
   const { signOut } = useAuth();
   const { production, fetchProduction, addProduction, updateProduction, deleteProduction } = useProduction();
   const { orders, addOrder, deleteOrder } = useOrders();
+  const { stock, addStock, deleteStock, getStockLevels } = useStock();
   const { start, end } = getWeekRange();
 
   const weekLabel = `${new Date(start).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} — ${new Date(end).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}`;
@@ -112,6 +115,14 @@ const Index = () => {
           <h2 className="font-display font-semibold text-lg mb-4">Historique de production</h2>
           <ProductionTable production={production} articles={articles} onDeleteProduction={deleteProduction} />
         </section>
+
+        <StockSection
+          stock={stock}
+          articles={articles}
+          onAddStock={addStock}
+          onDeleteStock={deleteStock}
+          getStockLevels={getStockLevels}
+        />
       </main>
     </div>
   );
