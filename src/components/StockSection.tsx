@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Plus, ArrowDownCircle, ArrowUpCircle, Trash2 } from "lucide-react";
+import { Package, Plus, ArrowDownCircle, ArrowUpCircle, Trash2, Search } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { type Article } from "@/lib/data";
 import { WORKSHOPS } from "@/lib/data";
@@ -30,6 +30,7 @@ interface Props {
 }
 
 export default function StockSection({ stock, articles, onAddStock, onDeleteStock, getStockLevels }: Props) {
+  const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [workshopId, setWorkshopId] = useState("");
   const [articleId, setArticleId] = useState("");
@@ -47,6 +48,22 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
   const workshopMap = new Map([...WORKSHOPS.map((w) => [w.id, w.name] as [string, string]), ...DESTINATIONS.map((d) => [d.id, d.name] as [string, string])]);
 
   const levels = getStockLevels();
+
+  const normalizedSearch = searchQuery.toLowerCase().trim();
+  const filteredLevels = normalizedSearch
+    ? levels.filter((l) => {
+        const art = articleMap.get(l.articleId);
+        const text = `${art?.name || ""} ${l.color || ""} ${l.size || ""}`.toLowerCase();
+        return text.includes(normalizedSearch);
+      })
+    : levels;
+  const filteredStock = normalizedSearch
+    ? stock.filter((s) => {
+        const art = articleMap.get(s.articleId);
+        const text = `${art?.name || ""} ${s.color || ""} ${s.size || ""}`.toLowerCase();
+        return text.includes(normalizedSearch);
+      })
+    : stock;
 
   const resetForm = () => {
     setWorkshopId("");
@@ -182,6 +199,16 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
         </Dialog>
       </div>
 
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Rechercher par article, couleur, taille..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
       <Tabs defaultValue="levels" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="levels" className="flex-1">État du stock</TabsTrigger>
@@ -189,11 +216,11 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
         </TabsList>
 
         <TabsContent value="levels">
-          {levels.length === 0 ? (
+          {filteredLevels.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">Aucun stock enregistré</p>
           ) : (
             <div className="space-y-2">
-              {levels.map((l, i) => {
+              {filteredLevels.map((l, i) => {
                 const art = articleMap.get(l.articleId);
                 return (
                   <div key={i} className="flex items-center gap-3 rounded-lg border p-3">
@@ -217,11 +244,11 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
         </TabsContent>
 
         <TabsContent value="history">
-          {stock.length === 0 ? (
+          {filteredStock.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">Aucun mouvement</p>
           ) : (
             <div className="space-y-2">
-              {stock.map((s) => {
+              {filteredStock.map((s) => {
                 const art = articleMap.get(s.articleId);
                 return (
                   <div key={s.id} className="flex items-center gap-3 rounded-lg border p-3 group">
