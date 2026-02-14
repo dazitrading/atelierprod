@@ -15,6 +15,11 @@ const COLORS = [
   "Noir", "Blanc", "Bleu Nuit", "Bleu Ciel", "Bleu Roi",
   "Rouge", "Bordeaux", "Vert", "Gris", "Beige", "Marron", "Rose", "Orange",
 ];
+const DESTINATIONS = [
+  { id: "dazi", name: "DAZI" },
+  { id: "top", name: "TOP" },
+  { id: "ecommerce", name: "ECOMMERCE" },
+];
 
 interface Props {
   stock: StockEntry[];
@@ -37,9 +42,9 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [note, setNote] = useState("");
 
-  const workshopArticles = articles.filter((a) => a.workshopId === workshopId);
+  const workshopArticles = movementType === "out" ? articles : articles.filter((a) => a.workshopId === workshopId);
   const articleMap = new Map(articles.map((a) => [a.id, a]));
-  const workshopMap = new Map(WORKSHOPS.map((w) => [w.id, w.name]));
+  const workshopMap = new Map([...WORKSHOPS.map((w) => [w.id, w.name] as [string, string]), ...DESTINATIONS.map((d) => [d.id, d.name] as [string, string])]);
 
   const levels = getStockLevels();
 
@@ -104,7 +109,7 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
                   type="button"
                   variant={movementType === "in" ? "default" : "outline"}
                   className="flex-1 gap-1.5"
-                  onClick={() => setMovementType("in")}
+                  onClick={() => { setMovementType("in"); setWorkshopId(""); setArticleId(""); }}
                 >
                   <ArrowDownCircle className="h-4 w-4" /> Entrée
                 </Button>
@@ -112,18 +117,23 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
                   type="button"
                   variant={movementType === "out" ? "default" : "outline"}
                   className="flex-1 gap-1.5"
-                  onClick={() => setMovementType("out")}
+                  onClick={() => { setMovementType("out"); setWorkshopId(""); setArticleId(""); }}
                 >
                   <ArrowUpCircle className="h-4 w-4" /> Sortie
                 </Button>
               </div>
 
               <Select value={workshopId} onValueChange={(v) => { setWorkshopId(v); setArticleId(""); }}>
-                <SelectTrigger><SelectValue placeholder="Atelier" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={movementType === "in" ? "Atelier" : "Destination"} /></SelectTrigger>
                 <SelectContent>
-                  {WORKSHOPS.map((w) => (
-                    <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
-                  ))}
+                  {movementType === "out"
+                    ? DESTINATIONS.map((d) => (
+                        <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                      ))
+                    : WORKSHOPS.map((w) => (
+                        <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                      ))
+                  }
                 </SelectContent>
               </Select>
 
