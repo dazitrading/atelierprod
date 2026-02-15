@@ -50,6 +50,21 @@ export function useProduction() {
       user_id: session.user.id,
     });
     if (error) throw error;
+
+    // Auto-add stock entry (entrée) for production from workshops
+    const { error: stockError } = await supabase.from("stock").insert({
+      article_id: entry.articleId,
+      workshop_id: entry.workshopId,
+      color: entry.color || null,
+      size: entry.size || null,
+      quantity: entry.quantity,
+      movement_type: "in",
+      date: entry.date,
+      note: `Production ${entry.workshopId}`,
+      user_id: session.user.id,
+    });
+    if (stockError) console.error("Erreur ajout stock auto:", stockError);
+
     await fetchProduction();
   }, [fetchProduction]);
 
