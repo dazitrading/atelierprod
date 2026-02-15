@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { ProductionEntry } from "@/lib/data";
+import { WORKSHOPS } from "@/lib/data";
 
 export function useProduction() {
   const [production, setProduction] = useState<ProductionEntry[]>([]);
@@ -60,7 +61,7 @@ export function useProduction() {
       quantity: entry.quantity,
       movement_type: "in",
       date: entry.date,
-      note: `Production ${entry.workshopId}`,
+      note: `Production ${WORKSHOPS.find(w => w.id === entry.workshopId)?.name || entry.workshopId}`,
       user_id: session.user.id,
     });
     if (stockError) console.error("Erreur ajout stock auto:", stockError);
