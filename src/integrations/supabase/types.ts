@@ -97,6 +97,7 @@ export type Database = {
           detail: string | null
           id: string
           quantity: number
+          size: string | null
           user_id: string | null
           workshop_id: string
         }
@@ -108,6 +109,7 @@ export type Database = {
           detail?: string | null
           id?: string
           quantity: number
+          size?: string | null
           user_id?: string | null
           workshop_id: string
         }
@@ -119,6 +121,7 @@ export type Database = {
           detail?: string | null
           id?: string
           quantity?: number
+          size?: string | null
           user_id?: string | null
           workshop_id?: string
         }
