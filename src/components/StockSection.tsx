@@ -45,7 +45,7 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
 
   const workshopArticles = movementType === "out" ? articles : articles.filter((a) => a.workshopId === workshopId);
   const articleMap = new Map(articles.map((a) => [a.id, a]));
-  const workshopMap = new Map([...WORKSHOPS.map((w) => [w.id, w.name] as [string, string]), ...DESTINATIONS.map((d) => [d.id, d.name] as [string, string])]);
+  const workshopMap = new Map([...WORKSHOPS.map((w) => [w.id, w.name] as [string, string]), ...DESTINATIONS.map((d) => [d.id, d.name] as [string, string]), ["autres", "Autres"]]);
 
   const levels = getStockLevels();
 
@@ -141,16 +141,19 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
               </div>
 
               <Select value={workshopId} onValueChange={(v) => { setWorkshopId(v); setArticleId(""); }}>
-                <SelectTrigger><SelectValue placeholder={movementType === "in" ? "Atelier" : "Destination"} /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={movementType === "in" ? "Sources" : "Destination"} /></SelectTrigger>
                 <SelectContent>
                   {movementType === "out"
                     ? DESTINATIONS.map((d) => (
                         <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
                       ))
-                    : WORKSHOPS.map((w) => (
-                        <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
-                      ))
-                  }
+                     : <>
+                         {WORKSHOPS.map((w) => (
+                           <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                         ))}
+                         <SelectItem value="autres">Autres</SelectItem>
+                       </>
+                   }
                 </SelectContent>
               </Select>
 
