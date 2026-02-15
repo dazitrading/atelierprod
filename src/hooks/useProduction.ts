@@ -24,6 +24,7 @@ export function useProduction() {
         quantity: e.quantity,
         date: e.date,
         color: e.color ?? undefined,
+        size: (e as any).size ?? undefined,
         detail: e.detail ?? undefined,
         createdAt: e.created_at,
       }))
@@ -44,6 +45,7 @@ export function useProduction() {
       quantity: entry.quantity,
       date: entry.date,
       color: entry.color || null,
+      size: entry.size || null,
       detail: entry.detail || null,
       user_id: session.user.id,
     });
@@ -58,6 +60,7 @@ export function useProduction() {
     if (updates.quantity !== undefined) dbUpdates.quantity = updates.quantity;
     if (updates.date !== undefined) dbUpdates.date = updates.date;
     if (updates.color !== undefined) dbUpdates.color = updates.color || null;
+    if (updates.size !== undefined) dbUpdates.size = updates.size || null;
     if (updates.detail !== undefined) dbUpdates.detail = updates.detail || null;
 
     const { error } = await supabase.from("production").update(dbUpdates).eq("id", id);

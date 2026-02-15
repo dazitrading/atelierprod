@@ -1,0 +1,1 @@
+ALTER TABLE public.production ADD COLUMN size TEXT DEFAULT NULL;

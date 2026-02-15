@@ -13,14 +13,17 @@ const COLORS = [
   "Vert", "Gris", "Beige", "Marron", "Rose", "Orange",
 ];
 
+const SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL"];
+
 interface LineEntry {
   articleId: string;
   quantity: string;
   color: string;
+  size: string;
   detail: string;
 }
 
-const emptyLine = (): LineEntry => ({ articleId: "", quantity: "", color: "", detail: "" });
+const emptyLine = (): LineEntry => ({ articleId: "", quantity: "", color: "", size: "", detail: "" });
 
 interface Props {
   onAdded: () => void;
@@ -68,6 +71,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
           quantity: Number(line.quantity),
           date,
           color: line.color.trim() || undefined,
+          size: line.size.trim() || undefined,
           detail: line.detail.trim() || undefined,
         });
       }
@@ -126,7 +130,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
             <div className="space-y-3">
               {lines.map((line, index) => (
                 <div key={index} className="flex items-start gap-2 p-3 rounded-lg border bg-muted/30">
-                  <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-2">
                     <Select value={line.articleId} onValueChange={(v) => updateLine(index, "articleId", v)}>
                       <SelectTrigger className="text-xs sm:text-sm">
                         <SelectValue placeholder="Article" />
@@ -156,6 +160,16 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
                       <SelectContent position="popper" side="bottom" align="start" className="max-h-[60vh] z-50">
                         {COLORS.map((c) => (
                           <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={line.size} onValueChange={(v) => updateLine(index, "size", v)}>
+                      <SelectTrigger className="text-xs sm:text-sm">
+                        <SelectValue placeholder="Taille" />
+                      </SelectTrigger>
+                      <SelectContent position="popper" side="bottom" align="start" className="max-h-[60vh] z-50">
+                        {SIZES.map((s) => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
