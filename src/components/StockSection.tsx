@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Plus, ArrowDownCircle, ArrowUpCircle, Trash2, Search } from "lucide-react";
+import { Plus, ArrowDownCircle, ArrowUpCircle, Trash2, Search } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { type Article } from "@/lib/data";
 import { WORKSHOPS } from "@/lib/data";
@@ -238,39 +238,59 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
             const groups = Array.from(grouped.values());
             if (groups.length === 0) return <p className="text-sm text-muted-foreground text-center py-8">Aucun stock enregistré</p>;
             return (
-              <div className="space-y-2">
-                {groups.map((g, i) => {
-                  const art = articleMap.get(g.articleId);
-                  // Sort sizes in logical order
-                  const sizeOrder = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
-                  const sortedSizes = Array.from(g.sizes.entries()).sort(([a], [b]) => {
-                    const ia = a ? sizeOrder.indexOf(a) : -1;
-                    const ib = b ? sizeOrder.indexOf(b) : -1;
-                    if (ia === -1 && ib === -1) return (a || "").localeCompare(b || "");
-                    if (ia === -1) return 1;
-                    if (ib === -1) return -1;
-                    return ia - ib;
-                  });
-                  return (
-                    <div key={i} className="rounded-lg border p-3">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <Package className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <p className="text-sm font-medium">{art?.name || "—"}</p>
-                        {g.color && <span className="text-xs bg-muted px-1.5 py-0.5 rounded">{g.color}</span>}
-                        <span className={`ml-auto font-display font-bold text-base ${g.total > 0 ? "text-green-600" : "text-destructive"}`}>
-                          {g.total} pcs
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 ml-6">
-                        {sortedSizes.map(([size, qty]) => (
-                          <span key={size || "—"} className={`text-xs font-medium px-2 py-0.5 rounded-full border ${qty > 0 ? "border-green-300 bg-green-50 text-green-700" : "border-red-200 bg-red-50 text-red-600"}`}>
-                            {qty} {size || "—"}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="rounded-lg border overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-secondary/50 text-left">
+                      <th className="px-3 py-2 font-medium text-muted-foreground">Article</th>
+                      <th className="px-3 py-2 font-medium text-muted-foreground">Couleur</th>
+                      <th className="px-3 py-2 font-medium text-muted-foreground">Tailles</th>
+                      <th className="px-3 py-2 font-medium text-muted-foreground text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {groups.map((g, i) => {
+                      const art = articleMap.get(g.articleId);
+                      const sizeOrder = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
+                      const sortedSizes = Array.from(g.sizes.entries()).sort(([a], [b]) => {
+                        const ia = a ? sizeOrder.indexOf(a) : -1;
+                        const ib = b ? sizeOrder.indexOf(b) : -1;
+                        if (ia === -1 && ib === -1) return (a || "").localeCompare(b || "");
+                        if (ia === -1) return 1;
+                        if (ib === -1) return -1;
+                        return ia - ib;
+                      });
+                      return (
+                        <tr key={i} className="border-t hover:bg-muted/30 transition-colors">
+                          <td className="px-3 py-2 font-medium">{art?.name || "—"}</td>
+                          <td className="px-3 py-2">
+                            {g.color
+                              ? <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">{g.color}</span>
+                              : <span className="text-xs text-muted-foreground">—</span>
+                            }
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="flex flex-wrap gap-1">
+                              {sortedSizes.map(([sz, qty]) => (
+                                <span
+                                  key={sz || "—"}
+                                  className={`text-xs font-medium px-1.5 py-0.5 rounded border ${qty > 0 ? "border-primary/30 bg-primary/10 text-primary" : "border-destructive/30 bg-destructive/10 text-destructive"}`}
+                                >
+                                  {qty} {sz || "—"}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            <span className={`font-display font-bold ${g.total > 0 ? "text-primary" : "text-destructive"}`}>
+                              {g.total} pcs
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             );
           })()}
