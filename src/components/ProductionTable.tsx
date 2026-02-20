@@ -61,10 +61,12 @@ export default function ProductionTable({ production, articles, onDeleteProducti
       const art = articleMap.get(e.articleId);
       const ws = workshopMap.get(e.workshopId);
       const total = art ? e.quantity * art.price : 0;
+      const details = [e.color, e.size, e.detail].filter(Boolean).join(" · ") || "—";
       return [
         new Date(e.date).toLocaleDateString("fr-FR"),
         ws?.name || "—",
         art?.name || "—",
+        details,
         e.quantity.toString(),
         art ? `${art.price.toLocaleString()} DH` : "—",
         `${total.toLocaleString()} DH`,
@@ -79,9 +81,9 @@ export default function ProductionTable({ production, articles, onDeleteProducti
 
     autoTable(doc, {
       startY: 32,
-      head: [["Date", "Atelier", "Article", "Qté", "Prix unit.", "Total"]],
+      head: [["Date", "Atelier", "Article", "Détails", "Qté", "Prix unit.", "Total"]],
       body: rows,
-      foot: [["", "", "TOTAL", grandQty.toString(), "", `${grandTotal.toLocaleString()} DH`]],
+      foot: [["", "", "TOTAL", "", grandQty.toString(), "", `${grandTotal.toLocaleString()} DH`]],
       styles: { fontSize: 9 },
       headStyles: { fillColor: [80, 80, 80] },
       footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: "bold" },
@@ -122,6 +124,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
               <TableHead>Date</TableHead>
               <TableHead>Atelier</TableHead>
               <TableHead>Article</TableHead>
+              <TableHead>Détails</TableHead>
               <TableHead className="text-right">Qté</TableHead>
               <TableHead className="text-right">Prix unit.</TableHead>
               <TableHead className="text-right">Total</TableHead>
@@ -150,6 +153,9 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                   </TableCell>
                   <TableCell className="font-medium">{workshop?.name || "—"}</TableCell>
                   <TableCell>{article?.name || "—"}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {[entry.color, entry.size, entry.detail].filter(Boolean).join(" · ") || "—"}
+                  </TableCell>
                   <TableCell className="text-right font-display font-semibold">{entry.quantity}</TableCell>
                   <TableCell className="text-right text-muted-foreground">{article?.price.toLocaleString() || "—"} DH</TableCell>
                   <TableCell className="text-right font-display font-semibold">{total.toLocaleString()} DH</TableCell>
@@ -212,6 +218,11 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                 <span className="font-medium text-sm">{workshop?.name || "—"}</span>
                 <span className="text-sm">{article?.name || "—"}</span>
               </div>
+              {[entry.color, entry.size, entry.detail].some(Boolean) && (
+                <div className="text-xs text-muted-foreground">
+                  {[entry.color, entry.size, entry.detail].filter(Boolean).join(" · ")}
+                </div>
+              )}
               <div className="flex items-center justify-between text-sm">
                 <span>{entry.quantity} {article?.name || "—"}</span>
                 <span className="font-display font-semibold">{total.toLocaleString()} DH</span>
