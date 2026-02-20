@@ -135,7 +135,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
                       <SelectTrigger className="text-xs sm:text-sm">
                         <SelectValue placeholder="Article" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent position="popper" side="bottom" align="start" className="max-h-[50vh] overflow-y-auto z-50">
                         {filteredArticles.length === 0 ? (
                           <div className="px-3 py-2 text-sm text-muted-foreground">Aucun article pour cet atelier</div>
                         ) : (
