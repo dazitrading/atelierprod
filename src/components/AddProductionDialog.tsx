@@ -157,7 +157,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
                       <SelectTrigger className="text-xs sm:text-sm">
                         <SelectValue placeholder="Couleur" />
                       </SelectTrigger>
-                      <SelectContent position="popper" side="bottom" align="start" className="max-h-[60vh] z-50">
+                      <SelectContent position="popper" side="bottom" align="start" avoidCollisions={false} className="max-h-[40vh] overflow-y-auto z-50">
                         {COLORS.map((c) => (
                           <SelectItem key={c} value={c}>{c}</SelectItem>
                         ))}
@@ -167,7 +167,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
                       <SelectTrigger className="text-xs sm:text-sm">
                         <SelectValue placeholder="Taille" />
                       </SelectTrigger>
-                      <SelectContent position="popper" side="bottom" align="start" className="max-h-[60vh] z-50">
+                      <SelectContent position="popper" side="bottom" align="start" avoidCollisions={false} className="max-h-[40vh] overflow-y-auto z-50">
                         {SIZES.map((s) => (
                           <SelectItem key={s} value={s}>{s}</SelectItem>
                         ))}
