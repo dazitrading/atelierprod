@@ -219,31 +219,61 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
         </TabsList>
 
         <TabsContent value="levels">
-          {filteredLevels.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">Aucun stock enregistré</p>
-          ) : (
-            <div className="space-y-2">
-              {filteredLevels.map((l, i) => {
-                const art = articleMap.get(l.articleId);
-                return (
-                  <div key={i} className="flex items-center gap-3 rounded-lg border p-3">
-                    <Package className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{art?.name || "—"}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {workshopMap.get(l.workshopId) || l.workshopId}
-                        {l.color && ` • ${l.color}`}
-                        {l.size && ` • ${l.size}`}
-                      </p>
+          {(() => {
+            // Group by articleId + color
+            const grouped = new Map<string, { articleId: string; color: string | null; sizes: Map<string | null, number>; total: number }>();
+            for (const l of filteredLevels) {
+              const key = `${l.articleId}-${l.color || ""}`;
+              const existing = grouped.get(key);
+              if (existing) {
+                const prevQty = existing.sizes.get(l.size) || 0;
+                existing.sizes.set(l.size, prevQty + l.quantity);
+                existing.total += l.quantity;
+              } else {
+                const sizes = new Map<string | null, number>();
+                sizes.set(l.size, l.quantity);
+                grouped.set(key, { articleId: l.articleId, color: l.color, sizes, total: l.quantity });
+              }
+            }
+            const groups = Array.from(grouped.values());
+            if (groups.length === 0) return <p className="text-sm text-muted-foreground text-center py-8">Aucun stock enregistré</p>;
+            return (
+              <div className="space-y-2">
+                {groups.map((g, i) => {
+                  const art = articleMap.get(g.articleId);
+                  // Sort sizes in logical order
+                  const sizeOrder = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
+                  const sortedSizes = Array.from(g.sizes.entries()).sort(([a], [b]) => {
+                    const ia = a ? sizeOrder.indexOf(a) : -1;
+                    const ib = b ? sizeOrder.indexOf(b) : -1;
+                    if (ia === -1 && ib === -1) return (a || "").localeCompare(b || "");
+                    if (ia === -1) return 1;
+                    if (ib === -1) return -1;
+                    return ia - ib;
+                  });
+                  return (
+                    <div key={i} className="rounded-lg border p-3">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Package className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <p className="text-sm font-medium">{art?.name || "—"}</p>
+                        {g.color && <span className="text-xs bg-muted px-1.5 py-0.5 rounded">{g.color}</span>}
+                        <span className={`ml-auto font-display font-bold text-base ${g.total > 0 ? "text-green-600" : "text-destructive"}`}>
+                          {g.total} pcs
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 ml-6">
+                        {sortedSizes.map(([size, qty]) => (
+                          <span key={size || "—"} className={`text-xs font-medium px-2 py-0.5 rounded-full border ${qty > 0 ? "border-green-300 bg-green-50 text-green-700" : "border-red-200 bg-red-50 text-red-600"}`}>
+                            {qty} {size || "—"}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <span className={`font-display font-bold text-lg ${l.quantity > 0 ? "text-green-600" : "text-destructive"}`}>
-                      {l.quantity}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            );
+          })()}
         </TabsContent>
 
         <TabsContent value="history">
