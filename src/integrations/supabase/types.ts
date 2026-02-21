@@ -141,6 +141,7 @@ export type Database = {
           color: string | null
           created_at: string
           date: string
+          detail: string | null
           id: string
           movement_type: string
           note: string | null
@@ -154,6 +155,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           date?: string
+          detail?: string | null
           id?: string
           movement_type?: string
           note?: string | null
@@ -167,6 +169,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           date?: string
+          detail?: string | null
           id?: string
           movement_type?: string
           note?: string | null
