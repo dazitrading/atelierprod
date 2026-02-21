@@ -220,10 +220,12 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
 
         <TabsContent value="levels">
           {(() => {
-            // Group by articleId + color
-            const grouped = new Map<string, { articleId: string; color: string | null; sizes: Map<string | null, number>; total: number }>();
+            // Group by article NAME + color to merge same-name articles
+            const grouped = new Map<string, { articleName: string; color: string | null; sizes: Map<string | null, number>; total: number }>();
             for (const l of filteredLevels) {
-              const key = `${l.articleId}-${l.color || ""}`;
+              const art = articleMap.get(l.articleId);
+              const artName = art?.name || "—";
+              const key = `${artName.toLowerCase()}-${(l.color || "").toLowerCase()}`;
               const existing = grouped.get(key);
               if (existing) {
                 const prevQty = existing.sizes.get(l.size) || 0;
@@ -232,7 +234,7 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
               } else {
                 const sizes = new Map<string | null, number>();
                 sizes.set(l.size, l.quantity);
-                grouped.set(key, { articleId: l.articleId, color: l.color, sizes, total: l.quantity });
+                grouped.set(key, { articleName: artName, color: l.color, sizes, total: l.quantity });
               }
             }
             const groups = Array.from(grouped.values());
@@ -250,7 +252,7 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
                   </thead>
                   <tbody>
                     {groups.map((g, i) => {
-                      const art = articleMap.get(g.articleId);
+                      const artName = g.articleName;
                       const sizeOrder = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
                       const sortedSizes = Array.from(g.sizes.entries()).sort(([a], [b]) => {
                         const ia = a ? sizeOrder.indexOf(a) : -1;
@@ -262,7 +264,7 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
                       });
                       return (
                         <tr key={i} className="border-t hover:bg-muted/30 transition-colors">
-                          <td className="px-3 py-2 font-medium">{art?.name || "—"}</td>
+                          <td className="px-3 py-2 font-medium">{artName}</td>
                           <td className="px-3 py-2">
                             {g.color
                               ? <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">{g.color}</span>
