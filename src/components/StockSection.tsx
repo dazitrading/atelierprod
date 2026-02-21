@@ -26,7 +26,7 @@ interface Props {
   articles: Article[];
   onAddStock: (entry: Omit<StockEntry, "id" | "createdAt">) => Promise<void>;
   onDeleteStock: (id: string) => Promise<void>;
-  getStockLevels: () => { articleId: string; workshopId: string; color: string | null; size: string | null; quantity: number }[];
+  getStockLevels: () => { articleId: string; workshopId: string; color: string | null; size: string | null; quantity: number; detail: string | null }[];
 }
 
 export default function StockSection({ stock, articles, onAddStock, onDeleteStock, getStockLevels }: Props) {
