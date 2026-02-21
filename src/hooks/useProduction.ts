@@ -62,6 +62,7 @@ export function useProduction() {
       movement_type: "in",
       date: entry.date,
       note: `Production ${WORKSHOPS.find(w => w.id === entry.workshopId)?.name || entry.workshopId}`,
+      detail: entry.detail || null,
       user_id: session.user.id,
     });
     if (stockError) console.error("Erreur ajout stock auto:", stockError);

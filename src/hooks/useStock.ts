@@ -11,6 +11,7 @@ export interface StockEntry {
   movementType: "in" | "out";
   date: string;
   note: string | null;
+  detail: string | null;
   createdAt: string;
 }
 
@@ -39,6 +40,7 @@ export function useStock() {
         movementType: s.movement_type as "in" | "out",
         date: s.date,
         note: s.note,
+        detail: s.detail ?? null,
         createdAt: s.created_at,
       }))
     );
@@ -90,13 +92,14 @@ export function useStock() {
 
   // Compute current stock levels grouped by article+color+size
   const getStockLevels = useCallback(() => {
-    const map = new Map<string, { articleId: string; workshopId: string; color: string | null; size: string | null; quantity: number }>();
+    const map = new Map<string, { articleId: string; workshopId: string; color: string | null; size: string | null; quantity: number; detail: string | null }>();
     for (const s of stock) {
       const key = `${s.articleId}-${s.color || ""}-${s.size || ""}`;
       const existing = map.get(key);
       const delta = s.movementType === "in" ? s.quantity : -s.quantity;
       if (existing) {
         existing.quantity += delta;
+        if (!existing.detail && s.detail) existing.detail = s.detail;
       } else {
         map.set(key, {
           articleId: s.articleId,
@@ -104,6 +107,7 @@ export function useStock() {
           color: s.color,
           size: s.size,
           quantity: delta,
+          detail: s.detail,
         });
       }
     }

@@ -96,6 +96,7 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
         movementType,
         date,
         note: note || null,
+        detail: null,
       });
       toast({ title: movementType === "in" ? "Entrée de stock ajoutée" : "Sortie de stock ajoutée" });
       resetForm();
@@ -221,7 +222,7 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
         <TabsContent value="levels">
           {(() => {
             // Group by article NAME + color to merge same-name articles
-            const grouped = new Map<string, { articleName: string; color: string | null; sizes: Map<string | null, number>; total: number }>();
+            const grouped = new Map<string, { articleName: string; color: string | null; detail: string | null; sizes: Map<string | null, number>; total: number }>();
             for (const l of filteredLevels) {
               const art = articleMap.get(l.articleId);
               const artName = art?.name || "—";
@@ -231,10 +232,11 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
                 const prevQty = existing.sizes.get(l.size) || 0;
                 existing.sizes.set(l.size, prevQty + l.quantity);
                 existing.total += l.quantity;
+                if (!existing.detail && l.detail) existing.detail = l.detail;
               } else {
                 const sizes = new Map<string | null, number>();
                 sizes.set(l.size, l.quantity);
-                grouped.set(key, { articleName: artName, color: l.color, sizes, total: l.quantity });
+                grouped.set(key, { articleName: artName, color: l.color, detail: l.detail, sizes, total: l.quantity });
               }
             }
             const groups = Array.from(grouped.values());
@@ -246,6 +248,7 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
                     <tr className="bg-secondary/50 text-left">
                       <th className="px-3 py-2 font-medium text-muted-foreground">Article</th>
                       <th className="px-3 py-2 font-medium text-muted-foreground">Couleur</th>
+                      <th className="px-3 py-2 font-medium text-muted-foreground">Détails</th>
                       <th className="px-3 py-2 font-medium text-muted-foreground">Tailles</th>
                       <th className="px-3 py-2 font-medium text-muted-foreground text-right">Total</th>
                     </tr>
@@ -268,6 +271,12 @@ export default function StockSection({ stock, articles, onAddStock, onDeleteStoc
                           <td className="px-3 py-2">
                             {g.color
                               ? <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">{g.color}</span>
+                              : <span className="text-xs text-muted-foreground">—</span>
+                            }
+                          </td>
+                          <td className="px-3 py-2">
+                            {g.detail
+                              ? <span className="text-xs text-muted-foreground">{g.detail}</span>
                               : <span className="text-xs text-muted-foreground">—</span>
                             }
                           </td>
