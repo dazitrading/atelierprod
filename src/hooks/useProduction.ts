@@ -1,7 +1,29 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { ProductionEntry } from "@/lib/data";
+import type { ProductionEntry, Article } from "@/lib/data";
 import { WORKSHOPS } from "@/lib/data";
+
+async function sendTelegramNotification(entry: Omit<ProductionEntry, "id">, articleName: string) {
+  try {
+    const workshopName = WORKSHOPS.find(w => w.id === entry.workshopId)?.name || entry.workshopId;
+    const lines = [
+      `📦 *Nouvelle Production*`,
+      `🏭 Atelier: ${workshopName}`,
+      `👔 Article: ${articleName}`,
+      `🔢 Quantité: ${entry.quantity}`,
+      `📅 Date: ${new Date(entry.date).toLocaleDateString("fr-FR")}`,
+    ];
+    if (entry.color) lines.push(`🎨 Couleur: ${entry.color}`);
+    if (entry.size) lines.push(`📏 Taille: ${entry.size}`);
+    if (entry.detail) lines.push(`📝 Détails: ${entry.detail}`);
+
+    await supabase.functions.invoke("send-telegram", {
+      body: { message: lines.join("\n") },
+    });
+  } catch (err) {
+    console.error("Erreur notification Telegram:", err);
+  }
+}
 
 export function useProduction() {
   const [production, setProduction] = useState<ProductionEntry[]>([]);
@@ -37,7 +59,7 @@ export function useProduction() {
     fetchProduction();
   }, [fetchProduction]);
 
-  const addProduction = useCallback(async (entry: Omit<ProductionEntry, "id">) => {
+  const addProduction = useCallback(async (entry: Omit<ProductionEntry, "id">, articleName?: string) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) throw new Error("Not authenticated");
     const { error } = await supabase.from("production").insert({
@@ -66,6 +88,10 @@ export function useProduction() {
       user_id: session.user.id,
     });
     if (stockError) console.error("Erreur ajout stock auto:", stockError);
+
+    // Send Telegram notification
+    const name = articleName || entry.articleId;
+    sendTelegramNotification(entry, name);
 
     await fetchProduction();
   }, [fetchProduction]);

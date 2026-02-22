@@ -27,7 +27,7 @@ const emptyLine = (): LineEntry => ({ articleId: "", quantity: "", color: "", si
 
 interface Props {
   onAdded: () => void;
-  addProduction: (entry: Omit<ProductionEntry, "id">) => Promise<void>;
+  addProduction: (entry: Omit<ProductionEntry, "id">, articleName?: string) => Promise<void>;
   articles: Article[];
 }
 
@@ -65,6 +65,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
     setSubmitting(true);
     try {
       for (const line of validLines) {
+        const article = articles.find(a => a.id === line.articleId);
         await addProduction({
           workshopId,
           articleId: line.articleId,
@@ -73,7 +74,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
           color: line.color.trim() || undefined,
           size: line.size.trim() || undefined,
           detail: line.detail.trim() || undefined,
-        });
+        }, article?.name);
       }
       toast({ title: "Production ajoutée", description: `${validLines.length} entrée(s) enregistrée(s).` });
 
