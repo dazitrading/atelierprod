@@ -151,7 +151,7 @@ export default function ArticleManager({ articles, workshopId, workshopName, onA
                 ) : (
                   <>
                     <span className="text-sm font-medium flex-1">{a.name}</span>
-                    <span className="text-sm text-muted-foreground">{a.price.toLocaleString()} DH</span>
+                    <span className="text-sm text-muted-foreground">{new Intl.NumberFormat("fr-FR").format(a.price)} DH</span>
                     <button onClick={() => startDuplicate(a)} className="text-muted-foreground hover:text-primary transition-colors" title="Dupliquer vers un autre atelier">
                       <Copy className="h-4 w-4" />
                     </button>

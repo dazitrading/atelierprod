@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article } from "@/lib/data";
+
+const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n);
 import { openWhatsApp } from "@/lib/whatsapp";
 import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2, Send } from "lucide-react";
 import { getArticleIcon } from "./UniformIcons";
@@ -97,10 +99,10 @@ export default function WorkshopCard({ workshop, production, articles, orders, w
       const art = articleMap.get(entry.articleId);
       if (art) {
         const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-        msg += `• ${date} — ${art.name} | Qté: ${entry.quantity} | Prix: ${art.price.toLocaleString()} DH | Total: ${(entry.quantity * art.price).toLocaleString()} DH\n`;
+        msg += `• ${date} — ${art.name} | Qté: ${entry.quantity} | Prix: ${fmt(art.price)} DH | Total: ${fmt(entry.quantity * art.price)} DH\n`;
       }
     }
-    msg += `\n📦 Total articles: ${totalItems}\n💰 Montant total: ${totalAmount.toLocaleString()} DH`;
+    msg += `\n📦 Total articles: ${totalItems}\n💰 Montant total: ${fmt(totalAmount)} DH`;
     openWhatsApp(msg);
   };
 
@@ -151,7 +153,7 @@ export default function WorkshopCard({ workshop, production, articles, orders, w
             <Banknote className="h-4 w-4 text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Montant</p>
-              <p className="font-display font-bold text-xl">{totalAmount.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">DH</span></p>
+              <p className="font-display font-bold text-xl">{fmt(totalAmount)} <span className="text-sm font-normal text-muted-foreground">DH</span></p>
             </div>
           </div>
         </div>
@@ -206,11 +208,11 @@ export default function WorkshopCard({ workshop, production, articles, orders, w
                     {article?.name || "—"}
                   </span>
                   <span className="text-sm font-semibold">{entry.quantity}</span>
-                  <span className="text-xs text-muted-foreground">× {article?.price.toLocaleString()} DH</span>
+                  <span className="text-xs text-muted-foreground">× {article ? fmt(article.price) : "—"} DH</span>
                   <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex gap-0.5 transition-opacity">
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700" onClick={() => {
                       const date = new Date(entry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name} | Qté: ${entry.quantity} | Prix: ${article?.price?.toLocaleString()} DH | Total: ${(entry.quantity * (article?.price || 0)).toLocaleString()} DH`;
+                      let msg = `📋 *${workshop.name}*\n📅 ${date}\n\n• ${article?.name} | Qté: ${entry.quantity} | Prix: ${article ? fmt(article.price) : "—"} DH | Total: ${fmt(entry.quantity * (article?.price || 0))} DH`;
                       if (entry.color) msg += `\n🎨 Couleur: ${entry.color}`;
                       if (entry.detail) msg += `\n📝 Détails: ${entry.detail}`;
                       openWhatsApp(msg);
