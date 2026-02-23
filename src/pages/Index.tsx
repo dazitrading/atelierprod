@@ -1,4 +1,5 @@
 import { WORKSHOPS, getWeekRange, getWorkshopWeeklyTotal } from "@/lib/data";
+const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n);
 import { useArticles } from "@/hooks/useArticles";
 import { useProduction } from "@/hooks/useProduction";
 import { useOrders } from "@/hooks/useOrders";
@@ -73,15 +74,15 @@ const Index = () => {
                   for (const entry of entries) {
                     const art = articleMap.get(entry.articleId);
                     if (art) {
-                      msg += `  • ${art.name} | ${entry.quantity} | ${art.price.toLocaleString()} DH | ${(entry.quantity * art.price).toLocaleString()} DH\n`;
+                      msg += `  • ${art.name} | ${entry.quantity} | ${fmt(art.price)} DH | ${fmt(entry.quantity * art.price)} DH\n`;
                     }
                   }
-                  msg += `  📦 Sous-total: ${totalItems} articles — ${totalAmount.toLocaleString()} DH\n`;
+                  msg += `  📦 Sous-total: ${totalItems} articles — ${fmt(totalAmount)} DH\n`;
                   grandTotal += totalAmount;
                   grandItems += totalItems;
                 }
 
-                msg += `\n✅ *TOTAL GÉNÉRAL: ${grandItems} articles — ${grandTotal.toLocaleString()} DH*`;
+                msg += `\n✅ *TOTAL GÉNÉRAL: ${grandItems} articles — ${fmt(grandTotal)} DH*`;
                 openWhatsApp(msg);
               }}
             >

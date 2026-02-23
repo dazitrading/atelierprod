@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Send, Printer } from "lucide-react";
 import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
+
+const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n);
 import { toast } from "@/hooks/use-toast";
 import { openWhatsApp } from "@/lib/whatsapp";
 import jsPDF from "jspdf";
@@ -68,8 +70,8 @@ export default function ProductionTable({ production, articles, onDeleteProducti
         art?.name || "—",
         details,
         e.quantity.toString(),
-        art ? `${art.price.toLocaleString()} DH` : "—",
-        `${total.toLocaleString()} DH`,
+        art ? `${fmt(art.price)} DH` : "—",
+        `${fmt(total)} DH`,
       ];
     });
 
@@ -83,7 +85,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
       startY: 32,
       head: [["Date", "Atelier", "Article", "Détails", "Qté", "Prix unit.", "Total"]],
       body: rows,
-      foot: [["", "", "TOTAL", "", grandQty.toString(), "", `${grandTotal.toLocaleString()} DH`]],
+      foot: [["", "", "TOTAL", "", fmt(grandQty), "", `${fmt(grandTotal)} DH`]],
       styles: { fontSize: 9 },
       headStyles: { fillColor: [80, 80, 80] },
       footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: "bold" },
@@ -157,14 +159,14 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                     {[entry.color, entry.size, entry.detail].filter(Boolean).join(" · ") || "—"}
                   </TableCell>
                   <TableCell className="text-right font-display font-semibold">{entry.quantity}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{article?.price.toLocaleString() || "—"} DH</TableCell>
-                  <TableCell className="text-right font-display font-semibold">{total.toLocaleString()} DH</TableCell>
+                  <TableCell className="text-right text-muted-foreground">{article ? fmt(article.price) : "—"} DH</TableCell>
+                  <TableCell className="text-right font-display font-semibold">{fmt(total)} DH</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" title="Envoyer par WhatsApp" onClick={() => {
                       const date = new Date(entry.date).toLocaleDateString("fr-FR");
                       const colorLine = entry.color ? `\n🎨 Couleur: ${entry.color}` : "";
                       const detailLine = entry.detail ? `\n📝 Détails: ${entry.detail}` : "";
-                      const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DH\n💰 Total: ${total.toLocaleString()} DH`;
+                      const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article ? fmt(article.price) : "—"} DH\n💰 Total: ${fmt(total)} DH`;
                       openWhatsApp(msg);
                     }}>
                       <Send className="h-3.5 w-3.5" />
@@ -204,7 +206,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
                     const date = new Date(entry.date).toLocaleDateString("fr-FR");
                     const colorLine = entry.color ? `\n🎨 Couleur: ${entry.color}` : "";
                     const detailLine = entry.detail ? `\n📝 Détails: ${entry.detail}` : "";
-                    const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article?.price.toLocaleString() || "—"} DH\n💰 Total: ${total.toLocaleString()} DH`;
+                    const msg = `📋 *Production du ${date}*\n🏭 Atelier: ${workshop?.name || "—"}\n👕 Article: ${article?.name || "—"}${colorLine}${detailLine}\n📦 Quantité: ${entry.quantity}\n💲 Prix unit.: ${article ? fmt(article.price) : "—"} DH\n💰 Total: ${fmt(total)} DH`;
                     openWhatsApp(msg);
                   }}>
                     <Send className="h-3.5 w-3.5" />
@@ -225,7 +227,7 @@ export default function ProductionTable({ production, articles, onDeleteProducti
               )}
               <div className="flex items-center justify-between text-sm">
                 <span>{entry.quantity} {article?.name || "—"}</span>
-                <span className="font-display font-semibold">{total.toLocaleString()} DH</span>
+                <span className="font-display font-semibold">{fmt(total)} DH</span>
               </div>
             </div>
           );
