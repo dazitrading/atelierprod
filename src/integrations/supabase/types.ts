@@ -94,6 +94,7 @@ export type Database = {
           color: string | null
           created_at: string
           date: string
+          destination: string | null
           detail: string | null
           id: string
           quantity: number
@@ -106,6 +107,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           date?: string
+          destination?: string | null
           detail?: string | null
           id?: string
           quantity: number
@@ -118,6 +120,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           date?: string
+          destination?: string | null
           detail?: string | null
           id?: string
           quantity?: number

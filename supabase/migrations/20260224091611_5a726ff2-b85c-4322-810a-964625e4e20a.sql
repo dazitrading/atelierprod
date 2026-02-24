@@ -1,0 +1,1 @@
+ALTER TABLE public.production ADD COLUMN destination text DEFAULT NULL;

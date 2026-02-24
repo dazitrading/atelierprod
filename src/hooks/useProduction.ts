@@ -49,6 +49,7 @@ export function useProduction() {
         color: e.color ?? undefined,
         size: (e as any).size ?? undefined,
         detail: e.detail ?? undefined,
+        destination: (e as any).destination ?? undefined,
         createdAt: e.created_at,
       }))
     );
@@ -70,6 +71,7 @@ export function useProduction() {
       color: entry.color || null,
       size: entry.size || null,
       detail: entry.detail || null,
+      destination: entry.destination || null,
       user_id: session.user.id,
     });
     if (error) throw error;
@@ -105,6 +107,7 @@ export function useProduction() {
     if (updates.color !== undefined) dbUpdates.color = updates.color || null;
     if (updates.size !== undefined) dbUpdates.size = updates.size || null;
     if (updates.detail !== undefined) dbUpdates.detail = updates.detail || null;
+    if (updates.destination !== undefined) dbUpdates.destination = updates.destination || null;
 
     const { error } = await supabase.from("production").update(dbUpdates).eq("id", id);
     if (error) throw error;

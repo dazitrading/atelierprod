@@ -14,6 +14,7 @@ const COLORS = [
 ];
 
 const SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL"];
+const DESTINATIONS = ["DAZI", "TOP UNIFORM"];
 
 interface LineEntry {
   articleId: string;
@@ -34,6 +35,7 @@ interface Props {
 export default function AddProductionDialog({ onAdded, addProduction, articles }: Props) {
   const [open, setOpen] = useState(false);
   const [workshopId, setWorkshopId] = useState("");
+  const [destination, setDestination] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [lines, setLines] = useState<LineEntry[]>([emptyLine()]);
   const [submitting, setSubmitting] = useState(false);
@@ -74,11 +76,13 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
           color: line.color.trim() || undefined,
           size: line.size.trim() || undefined,
           detail: line.detail.trim() || undefined,
+          destination: destination || undefined,
         }, article?.name);
       }
       toast({ title: "Production ajoutée", description: `${validLines.length} entrée(s) enregistrée(s).` });
 
       setWorkshopId("");
+      setDestination("");
       setLines([emptyLine()]);
       setOpen(false);
       onAdded();
@@ -105,7 +109,7 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
           <DialogTitle className="font-display">Nouvelle entrée de production</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
               <Label>Date</Label>
               <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -120,6 +124,17 @@ export default function AddProductionDialog({ onAdded, addProduction, articles }
                 <SelectContent>
                   {WORKSHOPS.map((w) => (
                     <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Destination</Label>
+              <Select value={destination} onValueChange={setDestination}>
+                <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                <SelectContent>
+                  {DESTINATIONS.map((d) => (
+                    <SelectItem key={d} value={d}>{d}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
