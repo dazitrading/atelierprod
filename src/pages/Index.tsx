@@ -1,5 +1,5 @@
 import { WORKSHOPS, getWeekRange, getWorkshopWeeklyTotal } from "@/lib/data";
-const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n);
+const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n).replace(/\u202F/g, ' ');
 import { useArticles } from "@/hooks/useArticles";
 import { useProduction } from "@/hooks/useProduction";
 import { useOrders } from "@/hooks/useOrders";
