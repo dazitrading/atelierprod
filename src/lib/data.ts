@@ -14,6 +14,7 @@ export interface ProductionEntry {
   color?: string;
   size?: string;
   detail?: string;
+  destination?: string;
   createdAt?: string; // ISO timestamp
 }
 
