@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type Workshop, getWorkshopWeeklyTotal, type ProductionEntry, type Article } from "@/lib/data";
 
-const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n);
+const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n).replace(/\u202F/g, ' ');
 import { openWhatsApp } from "@/lib/whatsapp";
 import { Factory, Package, Banknote, ChevronDown, ChevronUp, Pencil, Check, X, Trash2, Send } from "lucide-react";
 import { getArticleIcon } from "./UniformIcons";

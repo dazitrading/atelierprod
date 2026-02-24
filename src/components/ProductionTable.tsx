@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Send, Printer } from "lucide-react";
 import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
 
-const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n);
+const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n).replace(/\u202F/g, ' ');
 import { toast } from "@/hooks/use-toast";
 import { openWhatsApp } from "@/lib/whatsapp";
 import jsPDF from "jspdf";
