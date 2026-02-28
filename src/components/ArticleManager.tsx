@@ -138,8 +138,9 @@ export default function ArticleManager({ articles, workshopId, workshopName, onA
           <Input placeholder="Rechercher un article..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
         <div className="mt-2 max-h-72 space-y-1 overflow-y-auto">
+          <p className="text-xs text-muted-foreground px-1 pb-1">{workshopArticles.length} article{workshopArticles.length !== 1 ? 's' : ''}</p>
           {workshopArticles.length === 0 && (
-            <p className="py-4 text-center text-sm text-muted-foreground">Aucun article pour cet atelier</p>
+            <p className="py-4 text-center text-sm text-muted-foreground">Aucun article trouvé</p>
           )}
           {workshopArticles.map((a) => (
             <div key={a.id} className="space-y-1">
