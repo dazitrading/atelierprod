@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings, Plus, Trash2, Pencil, Check, X, Copy } from "lucide-react";
+import { Settings, Plus, Trash2, Pencil, Check, X, Copy, Search } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { WORKSHOPS, type Article } from "@/lib/data";
 
@@ -26,8 +26,11 @@ export default function ArticleManager({ articles, workshopId, workshopName, onA
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const [dupWorkshopId, setDupWorkshopId] = useState("");
   const [dupPrice, setDupPrice] = useState("");
+  const [search, setSearch] = useState("");
 
-  const workshopArticles = articles.filter((a) => a.workshopId === workshopId);
+  const workshopArticles = articles
+    .filter((a) => a.workshopId === workshopId)
+    .filter((a) => a.name.toLowerCase().includes(search.toLowerCase()));
   const otherWorkshops = WORKSHOPS.filter((w) => w.id !== workshopId);
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -130,6 +133,10 @@ export default function ArticleManager({ articles, workshopId, workshopName, onA
           <Input type="number" placeholder="Prix" value={price} onChange={(e) => setPrice(e.target.value)} className="w-24" />
           <Button type="submit" size="icon"><Plus className="h-4 w-4" /></Button>
         </form>
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Rechercher un article..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        </div>
         <div className="mt-2 max-h-72 space-y-1 overflow-y-auto">
           {workshopArticles.length === 0 && (
             <p className="py-4 text-center text-sm text-muted-foreground">Aucun article pour cet atelier</p>
