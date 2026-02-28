@@ -16,7 +16,9 @@ export function useArticles() {
       console.error("Error fetching articles:", error);
       return;
     }
-    setArticles((data || []).map((a) => ({ id: a.id, name: a.name, price: Number(a.price), workshopId: a.workshop_id })));
+    const mapped = (data || []).map((a) => ({ id: a.id, name: a.name, price: Number(a.price), workshopId: a.workshop_id }));
+    mapped.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+    setArticles(mapped);
     setLoading(false);
   }, []);
 
