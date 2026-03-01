@@ -3,7 +3,7 @@ const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n).replace(/\u2
 import { useArticles } from "@/hooks/useArticles";
 import { useProduction } from "@/hooks/useProduction";
 import { useOrders } from "@/hooks/useOrders";
-
+import { useFournitures } from "@/hooks/useFournitures";
 import { useAuth } from "@/hooks/useAuth";
 import WorkshopCard from "@/components/WorkshopCard";
 import ProductionTable from "@/components/ProductionTable";
@@ -17,6 +17,7 @@ const Index = () => {
   const { signOut } = useAuth();
   const { production, fetchProduction, addProduction, updateProduction, deleteProduction } = useProduction();
   const { orders, addOrder, deleteOrder } = useOrders();
+  const { fournitures, addFourniture, updateFourniture, deleteFourniture } = useFournitures();
   
   const { start, end } = getWeekRange();
 
@@ -106,6 +107,10 @@ const Index = () => {
                 onDeleteArticle={deleteArticle}
                 onAddOrder={addOrder}
                 onDeleteOrder={deleteOrder}
+                fournitures={fournitures}
+                onAddFourniture={addFourniture}
+                onUpdateFourniture={updateFourniture}
+                onDeleteFourniture={deleteFourniture}
               />
             ))}
           </div>
@@ -113,7 +118,7 @@ const Index = () => {
 
         <section>
           <h2 className="font-display font-semibold text-lg mb-4">Historique de production</h2>
-          <ProductionTable production={production} articles={articles} onDeleteProduction={deleteProduction} />
+          <ProductionTable production={production} articles={articles} fournitures={fournitures} onDeleteProduction={deleteProduction} />
         </section>
 
       </main>

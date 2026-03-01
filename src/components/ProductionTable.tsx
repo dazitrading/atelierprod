@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Trash2, Send, Printer, Search } from "lucide-react";
 import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
+import { type Fourniture } from "@/hooks/useFournitures";
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n).replace(/\u202F/g, ' ');
 import { toast } from "@/hooks/use-toast";
@@ -15,12 +16,14 @@ import autoTable from "jspdf-autotable";
 interface Props {
   production: ProductionEntry[];
   articles: Article[];
+  fournitures: Fourniture[];
   onDeleteProduction: (id: string) => Promise<void>;
 }
 
-export default function ProductionTable({ production, articles, onDeleteProduction }: Props) {
+export default function ProductionTable({ production, articles, fournitures, onDeleteProduction }: Props) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [workshopFilter, setWorkshopFilter] = useState<string>("");
+  const [includeFournitures, setIncludeFournitures] = useState(false);
   const articleMap = new Map(articles.map((a) => [a.id, a]));
   const workshopMap = new Map(WORKSHOPS.map((w) => [w.id, w]));
 
@@ -99,6 +102,49 @@ export default function ProductionTable({ production, articles, onDeleteProducti
       footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: "bold" },
     });
 
+    // Add fournitures section if includeFournitures is checked
+    if (includeFournitures && fournitures.length > 0) {
+      const workshopIds = [...new Set(entries.map((e) => e.workshopId))];
+      const relevantFournitures = fournitures.filter((f) => workshopIds.includes(f.workshopId));
+      
+      if (relevantFournitures.length > 0) {
+        const finalY = (doc as any).lastAutoTable?.finalY || 120;
+        doc.setFontSize(14);
+        doc.text("FOURNITURES", 14, finalY + 12);
+
+        for (const wsId of workshopIds) {
+          const ws = workshopMap.get(wsId);
+          const wsFournitures = relevantFournitures.filter((f) => f.workshopId === wsId);
+          if (wsFournitures.length === 0) continue;
+
+          const fRows = wsFournitures.map((f) => [
+            f.quantity.toString(),
+            f.article,
+            `${fmt(f.unitPrice)} DH`,
+            `${fmt(f.quantity * f.unitPrice)} DH`,
+          ]);
+          const fTotal = wsFournitures.reduce((s, f) => s + f.quantity * f.unitPrice, 0);
+
+          const startAt = (doc as any).lastAutoTable?.finalY 
+            ? (doc as any).lastAutoTable.finalY + 8 
+            : finalY + 18;
+
+          doc.setFontSize(11);
+          doc.text(`${ws?.name || wsId}`, 14, startAt);
+
+          autoTable(doc, {
+            startY: startAt + 4,
+            head: [["Quantité", "Article", "Prix Unit.", "Prix Total"]],
+            body: fRows,
+            foot: [["", "TOTAL", "", `${fmt(fTotal)} DH`]],
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [100, 100, 100] },
+            footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: "bold" },
+          });
+        }
+      }
+    }
+
     doc.save(`production_${new Date().toISOString().split("T")[0]}.pdf`);
     toast({ title: "PDF généré avec succès" });
   };
@@ -141,11 +187,15 @@ export default function ProductionTable({ production, articles, onDeleteProducti
         )}
       </div>
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex flex-wrap items-center gap-3 mb-3">
           <Button size="sm" variant="outline" className="gap-1.5" onClick={handlePrintSelected}>
             <Printer className="h-3.5 w-3.5" />
             Imprimer ({selectedIds.size})
           </Button>
+          <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+            <Checkbox checked={includeFournitures} onCheckedChange={(v) => setIncludeFournitures(!!v)} />
+            Inclure fournitures
+          </label>
           <span className="text-xs text-muted-foreground">{selectedIds.size} sélectionnée(s)</span>
         </div>
       )}
