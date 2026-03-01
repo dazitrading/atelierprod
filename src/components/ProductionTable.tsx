@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, Send, Printer } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Trash2, Send, Printer, Search } from "lucide-react";
 import { WORKSHOPS, type ProductionEntry, type Article } from "@/lib/data";
 
 const fmt = (n: number) => new Intl.NumberFormat("fr-FR").format(n).replace(/\u202F/g, ' ');
@@ -19,10 +20,17 @@ interface Props {
 
 export default function ProductionTable({ production, articles, onDeleteProduction }: Props) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [workshopFilter, setWorkshopFilter] = useState<string>("");
   const articleMap = new Map(articles.map((a) => [a.id, a]));
   const workshopMap = new Map(WORKSHOPS.map((w) => [w.id, w]));
 
-  const sorted = [...production].sort((a, b) => (b.createdAt || b.date).localeCompare(a.createdAt || a.date));
+  const sorted = [...production]
+    .filter((e) => {
+      if (!workshopFilter) return true;
+      const ws = workshopMap.get(e.workshopId);
+      return ws?.name.toLowerCase().includes(workshopFilter.toLowerCase());
+    })
+    .sort((a, b) => (b.createdAt || b.date).localeCompare(a.createdAt || a.date));
 
   const toggleId = (id: string) => {
     setSelectedIds((prev) => {
@@ -105,6 +113,33 @@ export default function ProductionTable({ production, articles, onDeleteProducti
 
   return (
     <>
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div className="relative flex-1 min-w-[180px] max-w-xs">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Filtrer par atelier..."
+            value={workshopFilter}
+            onChange={(e) => setWorkshopFilter(e.target.value)}
+            className="pl-8 h-8 text-sm"
+          />
+        </div>
+        {WORKSHOPS.map((w) => (
+          <Button
+            key={w.id}
+            size="sm"
+            variant={workshopFilter === w.name ? "default" : "outline"}
+            className="h-7 text-xs px-2.5"
+            onClick={() => setWorkshopFilter(workshopFilter === w.name ? "" : w.name)}
+          >
+            {w.name}
+          </Button>
+        ))}
+        {workshopFilter && (
+          <span className="text-xs text-muted-foreground ml-1">
+            {sorted.length} résultat{sorted.length !== 1 ? "s" : ""}
+          </span>
+        )}
+      </div>
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-2 mb-3">
           <Button size="sm" variant="outline" className="gap-1.5" onClick={handlePrintSelected}>
