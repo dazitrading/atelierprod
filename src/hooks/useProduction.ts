@@ -76,21 +76,6 @@ export function useProduction() {
     });
     if (error) throw error;
 
-    // Auto-add stock entry (entrée) for production from workshops
-    const { error: stockError } = await supabase.from("stock").insert({
-      article_id: entry.articleId,
-      workshop_id: entry.workshopId,
-      color: entry.color || null,
-      size: entry.size || null,
-      quantity: entry.quantity,
-      movement_type: "in",
-      date: entry.date,
-      note: `Production ${WORKSHOPS.find(w => w.id === entry.workshopId)?.name || entry.workshopId}`,
-      detail: entry.detail || null,
-      user_id: session.user.id,
-    });
-    if (stockError) console.error("Erreur ajout stock auto:", stockError);
-
     // Send Telegram notification
     const name = articleName || entry.articleId;
     sendTelegramNotification(entry, name);
