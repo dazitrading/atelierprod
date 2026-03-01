@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      fournitures: {
+        Row: {
+          article: string
+          created_at: string
+          id: string
+          quantity: number
+          unit_price: number
+          user_id: string | null
+          workshop_id: string
+        }
+        Insert: {
+          article: string
+          created_at?: string
+          id?: string
+          quantity?: number
+          unit_price?: number
+          user_id?: string | null
+          workshop_id: string
+        }
+        Update: {
+          article?: string
+          created_at?: string
+          id?: string
+          quantity?: number
+          unit_price?: number
+          user_id?: string | null
+          workshop_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           article_id: string

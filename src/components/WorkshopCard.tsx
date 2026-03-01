@@ -12,7 +12,9 @@ import { getArticleIcon } from "./UniformIcons";
 import { toast } from "@/hooks/use-toast";
 import ArticleManager from "./ArticleManager";
 import OrderSection from "./OrderSection";
+import FournituresSection from "./FournituresSection";
 import { type Order } from "@/hooks/useOrders";
+import { type Fourniture } from "@/hooks/useFournitures";
 
 const WORKSHOP_COLORS: Record<string, string> = {
   "atelier-1": "bg-workshop-1/10 border-workshop-1/30",
@@ -40,9 +42,13 @@ interface Props {
   onDeleteArticle: (id: string) => Promise<void>;
   onAddOrder: (order: Omit<Order, "id" | "createdAt">) => Promise<void>;
   onDeleteOrder: (id: string) => Promise<void>;
+  fournitures: Fourniture[];
+  onAddFourniture: (f: Omit<Fourniture, "id">) => Promise<void>;
+  onUpdateFourniture: (id: string, updates: Partial<Omit<Fourniture, "id">>) => Promise<void>;
+  onDeleteFourniture: (id: string) => Promise<void>;
 }
 
-export default function WorkshopCard({ workshop, production, articles, orders, weekStart, weekEnd, onUpdateProduction, onDeleteProduction, onAddArticle, onUpdateArticle, onDeleteArticle, onAddOrder, onDeleteOrder }: Props) {
+export default function WorkshopCard({ workshop, production, articles, orders, weekStart, weekEnd, onUpdateProduction, onDeleteProduction, onAddArticle, onUpdateArticle, onDeleteArticle, onAddOrder, onDeleteOrder, fournitures, onAddFourniture, onUpdateFourniture, onDeleteFourniture }: Props) {
   const workshopArticles = articles.filter((a) => a.workshopId === workshop.id);
   const { totalAmount, totalItems } = getWorkshopWeeklyTotal(
     workshop.id, production, workshopArticles, weekStart, weekEnd
@@ -231,6 +237,15 @@ export default function WorkshopCard({ workshop, production, articles, orders, w
             })}
           </div>
         )}
+
+        <FournituresSection
+          workshopId={workshop.id}
+          workshopName={workshop.name}
+          fournitures={fournitures}
+          onAdd={onAddFourniture}
+          onUpdate={onUpdateFourniture}
+          onDelete={onDeleteFourniture}
+        />
       </CardContent>
     </Card>
   );
