@@ -78,6 +78,7 @@ export default function ProductionTable({ production, articles, fournitures, onD
       return [
         new Date(e.date).toLocaleDateString("fr-FR"),
         ws?.name || "—",
+        e.destination || "—",
         art?.name || "—",
         details,
         e.quantity.toString(),
@@ -94,9 +95,9 @@ export default function ProductionTable({ production, articles, fournitures, onD
 
     autoTable(doc, {
       startY: 32,
-      head: [["Date", "Atelier", "Article", "Détails", "Qté", "Prix unit.", "Total"]],
+      head: [["Date", "Atelier", "Destination", "Article", "Détails", "Qté", "Prix unit.", "Total"]],
       body: rows,
-      foot: [["", "", "TOTAL", "", fmt(grandQty), "", `${fmt(grandTotal)} DH`]],
+      foot: [["", "", "", "TOTAL", "", fmt(grandQty), "", `${fmt(grandTotal)} DH`]],
       styles: { fontSize: 9 },
       headStyles: { fillColor: [80, 80, 80] },
       footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: "bold" },
@@ -210,6 +211,7 @@ export default function ProductionTable({ production, articles, fournitures, onD
               </TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Atelier</TableHead>
+              <TableHead>Destination</TableHead>
               <TableHead>Article</TableHead>
               <TableHead>Détails</TableHead>
               <TableHead className="text-right">Qté</TableHead>
@@ -239,6 +241,7 @@ export default function ProductionTable({ production, articles, fournitures, onD
                     )}
                   </TableCell>
                   <TableCell className="font-medium">{workshop?.name || "—"}</TableCell>
+                  <TableCell className="text-xs">{entry.destination || "—"}</TableCell>
                   <TableCell>{article?.name || "—"}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">
                     {[entry.color, entry.size, entry.detail].filter(Boolean).join(" · ") || "—"}
@@ -305,6 +308,9 @@ export default function ProductionTable({ production, articles, fournitures, onD
                 <span className="font-medium text-sm">{workshop?.name || "—"}</span>
                 <span className="text-sm">{article?.name || "—"}</span>
               </div>
+              {entry.destination && (
+                <div className="text-xs font-medium text-primary">📍 {entry.destination}</div>
+              )}
               {[entry.color, entry.size, entry.detail].some(Boolean) && (
                 <div className="text-xs text-muted-foreground">
                   {[entry.color, entry.size, entry.detail].filter(Boolean).join(" · ")}
