@@ -8,21 +8,16 @@ export default function Auth() {
   const [error, setError] = useState<string | null>(null);
 
   const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        setError(result.error.message);
-      }
-    } catch (err: any) {
-      setError(err.message || "Erreur de connexion");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin,
+    },
+  });
+  if (error) {
+    console.error("Erreur de connexion :", error.message);
+  }
+};
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
